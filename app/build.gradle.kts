@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-	namespace = "su.vi.simplydi"
-	compileSdk = 34
+	namespace = libs.versions.nameSpaceApp.get()
+	compileSdk = libs.versions.compileSDK.get().toInt()
 
 	defaultConfig {
-		applicationId = "su.vi.simplydi"
-		minSdk = 24
-		targetSdk = 34
+		applicationId = libs.versions.nameSpaceApp.get()
+		minSdk = libs.versions.minSDKVersionApp.get().toInt()
+		targetSdk = libs.versions.targetSDK.get().toInt()
 		versionCode = 1
 		versionName = "1.0"
 
@@ -31,19 +31,23 @@ android {
 		targetCompatibility = JavaVersion.VERSION_1_8
 	}
 	kotlinOptions {
-		jvmTarget = "1.8"
+		jvmTarget = JavaVersion.VERSION_1_8.toString()
 	}
 	buildFeatures {
 		compose = true
 	}
 	composeOptions {
-		kotlinCompilerExtensionVersion = "1.5.1"
+		kotlinCompilerExtensionVersion = libs.versions.kotlinCompilerExtensionVersion.get()
 	}
 	packaging {
 		resources {
 			excludes += "/META-INF/{AL2.0,LGPL2.1}"
 		}
 	}
+}
+
+kotlin {
+	explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
 }
 
 dependencies {
@@ -63,4 +67,9 @@ dependencies {
 	androidTestImplementation(libs.androidx.ui.test.junit4)
 	debugImplementation(libs.androidx.ui.tooling)
 	debugImplementation(libs.androidx.ui.test.manifest)
+
+	implementation(project(":SimplyDICore"))
+	//implementation(project(":SimplyDIAndroid"))
+	//implementation(project(":SimplyDIViewModel"))
+	//implementation(project(":SimplyDICompose"))
 }

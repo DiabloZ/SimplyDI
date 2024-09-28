@@ -1,4 +1,4 @@
-package su.vi.simplydicore
+package su.vi.simply
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
