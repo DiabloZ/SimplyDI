@@ -1,4 +1,4 @@
-package su.vi.simplydicore
+package su.vi.simply
 
 import org.junit.Test
 

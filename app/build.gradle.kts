@@ -69,7 +69,7 @@ dependencies {
 	debugImplementation(libs.androidx.ui.test.manifest)
 
 	implementation(project(":SimplyDICore"))
-	//implementation(project(":SimplyDIAndroid"))
+	implementation(project(":SimplyDIAndroid"))
 	implementation(project(":SimplyDIViewModel"))
 	//implementation(project(":SimplyDICompose"))
 }

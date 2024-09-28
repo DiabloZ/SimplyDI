@@ -23,6 +23,6 @@ dependencyResolutionManagement {
 rootProject.name = "SimplyDI"
 include(":app")
 include(":SimplyDICore")
-//include(":SimplyDIAndroid")
+include(":SimplyDIAndroid")
 //include(":SimplyDICompose")
 include(":SimplyDIViewModel")
