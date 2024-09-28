@@ -24,5 +24,5 @@ rootProject.name = "SimplyDI"
 include(":app")
 include(":SimplyDICore")
 include(":SimplyDIAndroid")
-//include(":SimplyDICompose")
+include(":SimplyDICompose")
 include(":SimplyDIViewModel")

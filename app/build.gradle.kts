@@ -71,5 +71,5 @@ dependencies {
 	implementation(project(":SimplyDICore"))
 	implementation(project(":SimplyDIAndroid"))
 	implementation(project(":SimplyDIViewModel"))
-	//implementation(project(":SimplyDICompose"))
+	implementation(project(":SimplyDICompose"))
 }
