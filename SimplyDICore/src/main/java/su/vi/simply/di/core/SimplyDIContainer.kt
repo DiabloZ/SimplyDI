@@ -13,10 +13,7 @@ import kotlin.time.measureTime
  * Singletone контейнер с [SimplyDIScope], нужен для первичной инициализации и получения зависимостей
  * по всему приложению.
  */
-public class SimplyDIContainer private constructor() {
-
-	private val mapContainers = mutableMapOf<String, SimplyDIScope>()
-	private val chainedScopes = mutableMapOf<String, MutableList<List<String>>>()
+public class SimplyDIContainer {
 	private var logger: SimplyDILogger = SimplyDILoggerEmpty()
 
 	/**
@@ -29,7 +26,7 @@ public class SimplyDIContainer private constructor() {
 		isSearchInScope: Boolean = true,
 	): Unit = synchronized(this) {
 		logger = simplyLogLevel.toSimplyDILogger()
-		if (mapContainers.containsKey(scopeName)) {
+		if (mapContainers.containsKey(scopeName) && scopeName != DEFAULT_SCOPE_NAME) {
 			logger.e(TAG, String.format(LOG_INIT_ALREADY, scopeName))
 			return
 		}
@@ -277,6 +274,9 @@ public class SimplyDIContainer private constructor() {
 
 	public companion object {
 		private const val TAG = "SIMPLY DI CONTAINER"
+
+		private val mapContainers = mutableMapOf<String, SimplyDIScope>()
+		private val chainedScopes = mutableMapOf<String, MutableList<List<String>>>()
 
 		private const val LOG_INIT = "Scope with name - %s has been initialized"
 		private const val LOG_INIT_CHAIN = "Created a chain with scopes - %s"

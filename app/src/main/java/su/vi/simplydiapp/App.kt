@@ -20,34 +20,22 @@ class App: Application() {
 	override fun onCreate() {
 		super.onCreate()
 		val time = measureTime {
-			SimplyDIContainer.instance.initializeAndroid(context = this)
-			SimplyDIContainer.instance.initialize()
-			SimplyDIContainer.instance.initialize(scopeName = "6", isSearchInScope = false)
-			SimplyDIContainer.instance.initialize(scopeName = "6", isSearchInScope = false)
-			SimplyDIContainer.instance.initialize(scopeName = "5", isSearchInScope = true)
-			SimplyDIContainer.instance.initialize(scopeName = "4", isSearchInScope = false, simplyLogLevel = SimplyLogLevel.FULL)
-			SimplyDIContainer.instance.initialize(scopeName = "3", isSearchInScope = true)
-			SimplyDIContainer.instance.initialize(scopeName = "2", isSearchInScope = true)
-			SimplyDIContainer.instance.initialize(scopeName = "1", isSearchInScope = true)
-			SimplyDIContainer.instance.initialize(scopeName = "12345", isSearchInScope = true)
-			SimplyDIContainer.instance.addDependencyNow<Bububu>() {
-				Bububu()
-			}
-			SimplyDIContainer.instance.addDependencyNow<Bububu>(scopeName = "1") {
-				Bububu()
-			}
-			SimplyDIContainer.instance.addDependencyLater<Bububu>(scopeName = "12345") {
-				Bububu()
-			}
-			SimplyDIContainer.instance.addDependencyLater<Bububu>(scopeName = "12345") {
-				Bububu() //This method will send message about replace to console.
-			}
-			SimplyDIContainer.instance.replaceDependencyLater<Bububu>(scopeName = "12345") {
-				Bububu()
-			}
-			SimplyDIContainer.instance.addChainScopes(
-				listOfScopes = listOf("6", "12345", DEFAULT_SCOPE_NAME, "5")
-			)
+			SimplyDIContainer().initializeAndroid(context = this, simplyLogLevel = SimplyLogLevel.FULL)
+			SimplyDIContainer().initialize(simplyLogLevel = SimplyLogLevel.FULL)
+			SimplyDIContainer().initialize(scopeName = "6", isSearchInScope = false)
+			SimplyDIContainer().initialize(scopeName = "6", isSearchInScope = false, simplyLogLevel = SimplyLogLevel.FULL)
+			SimplyDIContainer().initialize(scopeName = "5", isSearchInScope = true)
+			SimplyDIContainer().initialize(scopeName = "4", isSearchInScope = false, simplyLogLevel = SimplyLogLevel.FULL)
+			SimplyDIContainer().initialize(scopeName = "3", isSearchInScope = true)
+			SimplyDIContainer().initialize(scopeName = "2", isSearchInScope = true)
+			SimplyDIContainer().initialize(scopeName = "1", isSearchInScope = true)
+			SimplyDIContainer().initialize(scopeName = "12345", isSearchInScope = true, simplyLogLevel = SimplyLogLevel.FULL)
+			SimplyDIContainer().addDependencyNow<Bububu>() { Bububu() }
+			SimplyDIContainer().addDependencyNow<Bububu>(scopeName = "1") { Bububu() }
+			SimplyDIContainer().addDependencyLater<Bububu>(scopeName = "12345") { Bububu() }
+			SimplyDIContainer().addDependencyLater<Bububu>(scopeName = "12345") { Bububu() /**This will send message about replace to console.**/ }
+			SimplyDIContainer().replaceDependencyLater<Bububu>(scopeName = "12345") { Bububu() }
+			SimplyDIContainer().addChainScopes( listOfScopes = listOf("6", "12345", DEFAULT_SCOPE_NAME, "5"))
 			//SimplyDIContainer.instance.depBenchmark<Bububu>()
 			/*		SimplyDIContainer.instance.deleteChainedScopes(
 						listOfScopes = listOf("6", "12345", DEFAULT_SCOPE_NAME, "5")
