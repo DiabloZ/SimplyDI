@@ -73,3 +73,17 @@ public inline fun <reified T : Any> SimplyDIContainer.deleteDependency(
 public inline fun <reified T : Any> SimplyDIContainer.depBenchmark(): Unit = depBenchmark<T> (
 	clazz = T::class
 )
+
+public fun SimplyDIContainer.addChainScopes(listOfScopes: List<String>){
+	addChainScopes(listOfScopes)
+}
+
+public fun SimplyDIContainer.initialize(
+	scopeName: String = DEFAULT_SCOPE_NAME,
+	isSearchInScope: Boolean = true,
+) {
+	initialize(
+		scopeName = scopeName,
+		isSearchInScope = isSearchInScope
+	)
+}

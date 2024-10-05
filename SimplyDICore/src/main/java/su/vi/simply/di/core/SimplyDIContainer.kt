@@ -14,12 +14,13 @@ import kotlin.time.measureTime
 public class SimplyDIContainer private constructor() {
 
 	private val mapContainers = mutableMapOf<String, SimplyDIScope>()
+	private val chainedScopes = mutableMapOf<String, MutableList<List<String>>>()
 
 	/**
 	 * Метод для первичной инициализации, является корнем зависомостей,
 	 * должен находится максимально близко к app context.
 	 */
-	public fun initialize(
+	internal fun initialize(
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		isSearchInScope: Boolean = true,
 	): Unit = synchronized(this) {
@@ -78,8 +79,12 @@ public class SimplyDIContainer private constructor() {
 		clazz: KClass<*>,
 		scopeName: String = DEFAULT_SCOPE_NAME,
 	): Unit = synchronized(this) {
-		mapContainers[scopeName]?.delete(clazz)
-		SimplyDILogger.d(TAG, "$DELETE_DEP${clazz}")
+		mapContainers[scopeName]?.apply {
+			delete(clazz)
+			SimplyDILogger.d(TAG, "$DELETE_DEP${clazz}")
+			return@synchronized
+		}
+		SimplyDILogger.d(TAG, "$DELETE_DEP_ERR${clazz}")
 	}
 
 	/**
@@ -93,8 +98,13 @@ public class SimplyDIContainer private constructor() {
 		scopeName: String = DEFAULT_SCOPE_NAME,
 	): T {
 		SimplyDILogger.d(TAG, "$GET_DEP_SINGLE${clazz}")
-		return mapContainers[scopeName]?.getDependency(clazz)
-			?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
+		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
+		return scope.getNullableDependency(clazz)
+			?: findInChainScopes(
+				scopeName = scopeName,
+				clazz = clazz
+			)
+			?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, clazz))
 	}
 
 	/**
@@ -118,13 +128,55 @@ public class SimplyDIContainer private constructor() {
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		clazz: KClass<*>,
 	): T {
-		SimplyDILogger.d(TAG, "$GET_DEP_FACTORY_WITH_ERROR$clazz")
-		return mapContainers[scopeName]?.getByClass(clazz)
+		SimplyDILogger.d(TAG, "$GET_DEP_FACTORY_WITH_ERROR${clazz}")
+		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
+		return scope.getByClass(clazz)
+			?: findInChainScopes(
+				scopeName = scopeName,
+				clazz = clazz
+			)
 			?: mapContainers
 				.filter { entry -> entry.value.isSearchInScope }
 				.mapNotNull { diScopeEntry -> diScopeEntry.value.getByClass(clazz) }
 				.firstOrNull() as? T
-			?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
+			?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, clazz))
+	}
+
+	@Throws(SimplyDINotFoundException::class)
+	public fun <T: Any> getByClass(
+		scopeName: String = DEFAULT_SCOPE_NAME,
+		clazz: KClass<*>,
+	): T? {
+		SimplyDILogger.d(TAG, "$GET_DEP_FACTORY_NULLABLE${clazz}")
+		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
+		return scope.getByClass<T>(clazz)
+	}
+
+	internal fun addChainScopes(
+		listOfScopes: List<String>
+	): Unit = synchronized(this) {
+		SimplyDILogger.d(TAG, String.format(LOG_INIT_CHAIN, listOfScopes.joinToString(prefix = "\"", separator = "\", \"", postfix = "\"")))
+		listOfScopes.forEach { scopeName ->
+			val scope = chainedScopes[scopeName] ?: mutableListOf()
+			scope.add(listOfScopes)
+			chainedScopes[scopeName] = scope
+		}
+	}
+
+	private fun <T : Any> findInChainScopes(
+		clazz: KClass<*>,
+		scopeName: String = DEFAULT_SCOPE_NAME,
+	): T? {
+		chainedScopes[scopeName]?.forEach { chainedScopes ->
+			chainedScopes.forEach { chainedName ->
+				if (scopeName != chainedName){
+					mapContainers[chainedName]?.getNullableDependency<T>(clazz = clazz)?.let { dependency ->
+						return dependency
+					}
+				}
+			}
+		}
+		return null
 	}
 
 	@Suppress("UNCHECKED_CAST")
@@ -168,21 +220,11 @@ public class SimplyDIContainer private constructor() {
 		}
 	}
 
-
-
-	@Throws(SimplyDINotFoundException::class)
-	public fun <T: Any> getByClass(
-		scopeName: String = DEFAULT_SCOPE_NAME,
-		clazz: KClass<*>,
-	): T? {
-		SimplyDILogger.d(TAG, "$GET_DEP_FACTORY_NULLABLE$clazz")
-		return mapContainers[scopeName]?.getByClass<T>(clazz)
-	}
-
 	public companion object {
 		private const val TAG = "SIMPLY DI CONTAINER"
 
 		private const val LOG_INIT = "Scope with name - %s has been initialized"
+		private const val LOG_INIT_CHAIN = "Created chain with scopes - %s"
 		private const val LOG_INIT_ALREADY = "Scope with name - %s has already been initialized"
 		private const val SCOPE_IS_NOT_INITIALIZED = "∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇\n" +
 			"|||||||||||||||| 1.Scope is not initialized.\n" +
@@ -194,10 +236,12 @@ public class SimplyDIContainer private constructor() {
 		private const val CREATE_DEP_IMMEDIATELY = "Добавлена зависимость немеденно - "
 		private const val CREATE_DEP_LAZY = "Добавлена зависимость отложенно - "
 		private const val DELETE_DEP = "Удалена зависимость - "
+		private const val DELETE_DEP_ERR = "You try to delete dependency in not created scope"
 		private const val GET_DEP_SINGLE = "Запрошена зависимость с добавлением в контейнер - "
 		private const val GET_DEP_FACTORY = "Запрошена зависимость без добавления - "
 		private const val GET_DEP_FACTORY_WITH_ERROR = "Запрошена зависимость без добавления с ошибкой - "
 		private const val GET_DEP_FACTORY_NULLABLE = "Запрошена зависимость без добавления нулабельно - "
+		private const val NOT_FOUND_ERROR = "In the beginning, you need to register such a service - %s, before calling it"
 		public val instance: SimplyDIContainer = SimplyDIContainer()
 	}
 }

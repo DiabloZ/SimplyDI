@@ -4,6 +4,7 @@ import android.content.Context
 import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.simply.di.core.utils.addDependencyNow
+import su.vi.simply.di.core.utils.initialize
 
 /*
 class SimplyDIContainerAndroidExtensions {

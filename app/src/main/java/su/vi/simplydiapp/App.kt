@@ -4,8 +4,12 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import su.vi.simply.di.android.initializeAndroid
 import su.vi.simply.di.core.SimplyDIContainer
+import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
+import su.vi.simply.di.core.utils.addChainScopes
 import su.vi.simply.di.core.utils.addDependencyLater
 import su.vi.simply.di.core.utils.addDependencyNow
+import su.vi.simply.di.core.utils.initialize
+import su.vi.simplydiapp.for_test.Bububu
 
 class App: Application() {
 	override fun onCreate() {
@@ -29,9 +33,9 @@ class App: Application() {
 		SimplyDIContainer.instance.addDependencyLater<Bububu>(scopeName = "12345") {
 			Bububu()
 		}
+		SimplyDIContainer.instance.addChainScopes(
+			listOfScopes = listOf("6", "12345", DEFAULT_SCOPE_NAME, "5")
+		)
 		//SimplyDIContainer.instance.depBenchmark<Bububu>()
 	}
-}
-class Bububu: ViewModel(){
-
 }

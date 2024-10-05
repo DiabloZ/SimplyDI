@@ -20,10 +20,20 @@ internal class SimplyDIScope(
 	private val listOfDependencies: MutableSet<Any> = mutableSetOf()
 
 	/**
-	 * Метод генерации ошибки, при ненахождении класса.
-	 */
-	private fun getNotFoundError(name: String?) =
-		"In the beginning, you need to register such a service - $name, before calling it"
+	 * Метод для получения нулабельной зависимости
+	 * @return T
+	 * @throws SimplyDINotFoundException если зависимость не будет найдена
+	 **/
+	@Suppress("UNCHECKED_CAST")
+	internal fun <T: Any> getNullableDependency(clazz: KClass<*>): T? {
+		val dependency = listOfDependencies.find { dependency -> dependency::class == clazz } ?: run {
+			val newInstance = initializerFactory[clazz]?.invoke()
+				?: return null
+			listOfDependencies.add(newInstance)
+			newInstance
+		}
+		return (dependency as? T)
+	}
 
 	/**
 	 * Метод для получения зависимости
@@ -35,18 +45,18 @@ internal class SimplyDIScope(
 	internal fun <T: Any> getDependency(clazz: KClass<*>): T {
 		val dependency = listOfDependencies.find { dependency -> dependency::class == clazz } ?: run {
 			val newInstance = initializerFactory[clazz]?.invoke()
-				?: throw SimplyDINotFoundException(message = getNotFoundError(clazz.simpleName))
+				?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, clazz.simpleName))
 			listOfDependencies.add(newInstance)
 			newInstance
 		}
 		return (dependency as? T)
-			?: throw SimplyDINotFoundException(message = getNotFoundError(clazz.simpleName))
+			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, clazz.simpleName))
 	}
 
 	@Suppress("UNCHECKED_CAST")
 	internal fun <T: Any> getFactoryDependency(clazz: KClass<*>): T {
 		return initializerFactory[clazz]?.invoke() as? T
-			?: throw SimplyDINotFoundException(message = getNotFoundError(clazz.simpleName))
+			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, clazz.simpleName))
 	}
 
 	/**
@@ -70,7 +80,7 @@ internal class SimplyDIScope(
 		clazz: KClass<*>,
 	): T {
 		return initializerFactory[clazz]?.invoke() as? T
-			?: throw SimplyDINotFoundException(message = getNotFoundError(clazz.simpleName))
+			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, clazz.simpleName))
 	}
 
 	/**
@@ -110,6 +120,10 @@ internal class SimplyDIScope(
 			.forEach {
 				listOfDependencies.remove(it)
 			}
+	}
+
+	companion object {
+		private const val NOT_FOUND_ERROR = "In the beginning, you need to register such a service - %s, before calling it"
 	}
 
 }
