@@ -38,9 +38,9 @@ class App: Application() {
 		SimplyDIContainer.instance.addChainScopes(
 			listOfScopes = listOf("6", "12345", DEFAULT_SCOPE_NAME, "5")
 		)
-		SimplyDIContainer.instance.deleteChainedScopes(
-			listOfScopes = listOf("6", "12345", DEFAULT_SCOPE_NAME, "5")
-		)
 		SimplyDIContainer.instance.depBenchmark<Bububu>()
+/*		SimplyDIContainer.instance.deleteChainedScopes(
+			listOfScopes = listOf("6", "12345", DEFAULT_SCOPE_NAME, "5")
+		)*/
 	}
 }

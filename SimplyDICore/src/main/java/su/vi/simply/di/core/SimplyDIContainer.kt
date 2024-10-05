@@ -135,7 +135,7 @@ public class SimplyDIContainer private constructor() {
 				scopeName = scopeName,
 				clazz = clazz
 			)
-			?: mapContainers
+			?: mapContainers.asSequence()
 				.filter { entry -> entry.value.isSearchInScope }
 				.mapNotNull { diScopeEntry -> diScopeEntry.value.getByClass(clazz) }
 				.firstOrNull() as? T
@@ -203,6 +203,7 @@ public class SimplyDIContainer private constructor() {
 				var syncTimer = 0L
 				var usuTimer = 0L
 				var seqTimer = 0L
+				var seqDifTimer = 0L
 
 				repeat(times) {
 					seqTimer += measureTime {
@@ -210,7 +211,7 @@ public class SimplyDIContainer private constructor() {
 							.filter { entry -> entry.value.isSearchInScope }
 							.mapNotNull { diScopeEntry -> diScopeEntry.value.getByClass(clazz) }
 							.firstOrNull() as? T
-					}.inWholeNanoseconds
+					}.inWholeNanoseconds / 1000
 
 
 
@@ -219,23 +220,23 @@ public class SimplyDIContainer private constructor() {
 							.filter { entry -> entry.value.isSearchInScope }
 							.mapNotNull { diScopeEntry -> diScopeEntry.value.getByClass(clazz) }
 							.firstOrNull() as? T
-					}.inWholeNanoseconds
+					}.inWholeNanoseconds / 1000
 				}
 				repeat(times){
 					syncTimer += measureTime {
-						getDependency(clazz)
-					}.inWholeNanoseconds
+						getByClassAnyway(clazz = clazz)
+					}.inWholeNanoseconds / 1000
 				}
 				mainusuTimer += usuTimer
 				mainseqTimer += seqTimer
 				mainsyncTimer += syncTimer
-				SimplyDILogger.e(TAG, "asSequence -  ${seqTimer / times}")
-				SimplyDILogger.e(TAG, "usualArray -  ${usuTimer / times}")
-				SimplyDILogger.e(TAG, "syncTimer -  ${syncTimer / times}")
+				SimplyDILogger.e(TAG, "asSequence -  ${seqTimer / times} ms")
+				SimplyDILogger.e(TAG, "usualArray -  ${usuTimer / times} ms")
+				SimplyDILogger.e(TAG, "syncTimer -  ${syncTimer / times} ms")
 			}
-			SimplyDILogger.e(TAG, "Main asSequence -  ${mainseqTimer/(mainTimes *times)}")
-			SimplyDILogger.e(TAG, "Main usualArray -  ${mainusuTimer/(mainTimes *times)}")
-			SimplyDILogger.e(TAG, "Main syncTimer -  ${mainsyncTimer/(mainTimes *times)}")
+			SimplyDILogger.e(TAG, "Main asSequence -  ${mainseqTimer/(mainTimes *times)} ms")
+			SimplyDILogger.e(TAG, "Main usualArray -  ${mainusuTimer/(mainTimes *times)} ms")
+			SimplyDILogger.e(TAG, "Main syncTimer -  ${mainsyncTimer/(mainTimes *times)} ms")
 		}
 	}
 
