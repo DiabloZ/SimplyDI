@@ -1,9 +1,10 @@
 package su.vi.simplydiapp
 
 import android.app.Application
+import android.util.Log
 import su.vi.simply.di.android.initializeAndroid
+import su.vi.simply.di.core.utils.SimplyLogLevel
 import su.vi.simply.di.core.SimplyDIContainer
-import su.vi.simply.di.core.SimplyDILogger
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.simply.di.core.utils.addChainScopes
 import su.vi.simply.di.core.utils.addDependencyLater
@@ -24,7 +25,7 @@ class App: Application() {
 			SimplyDIContainer.instance.initialize(scopeName = "6", isSearchInScope = false)
 			SimplyDIContainer.instance.initialize(scopeName = "6", isSearchInScope = false)
 			SimplyDIContainer.instance.initialize(scopeName = "5", isSearchInScope = true)
-			SimplyDIContainer.instance.initialize(scopeName = "4", isSearchInScope = false)
+			SimplyDIContainer.instance.initialize(scopeName = "4", isSearchInScope = false, simplyLogLevel = SimplyLogLevel.FULL)
 			SimplyDIContainer.instance.initialize(scopeName = "3", isSearchInScope = true)
 			SimplyDIContainer.instance.initialize(scopeName = "2", isSearchInScope = true)
 			SimplyDIContainer.instance.initialize(scopeName = "1", isSearchInScope = true)
@@ -53,7 +54,7 @@ class App: Application() {
 					)*/
 		}.inWholeMilliseconds
 
-		SimplyDILogger.e(TAG, "INITED FOR - $time ms")
+		Log.e(TAG, "INITED FOR - $time ms")
 	}
 
 	public companion object {

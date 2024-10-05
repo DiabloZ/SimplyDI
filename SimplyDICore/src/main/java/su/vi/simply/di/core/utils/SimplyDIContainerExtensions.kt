@@ -107,10 +107,12 @@ public fun SimplyDIContainer.deleteChainedScopes(listOfScopes: List<String>){
 
 public fun SimplyDIContainer.initialize(
 	scopeName: String = DEFAULT_SCOPE_NAME,
+	simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
 	isSearchInScope: Boolean = true,
 ) {
 	initialize(
 		scopeName = scopeName,
+		simplyLogLevel = simplyLogLevel,
 		isSearchInScope = isSearchInScope
 	)
 }

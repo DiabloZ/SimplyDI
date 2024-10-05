@@ -1,6 +1,7 @@
 package su.vi.simplydiapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -13,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import su.vi.simply.di.android.simplyAndroidViewModel
 import su.vi.simply.di.compose.simplyComposeViewModel
-import su.vi.simply.di.core.SimplyDILogger
 import su.vi.simply.di.core.delegates.inject
 import su.vi.simplydiapp.for_test.Bububu
 import su.vi.simplydiapp.ui.theme.SimplyDITheme
@@ -23,31 +23,31 @@ class MainActivity : ComponentActivity() {
 	private val asdass by inject<Bububu>(scopeName = "1")
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		SimplyDILogger.d("SIMPLY DI CONTAINER", asdas.hashCode().toString())
-		SimplyDILogger.d("SIMPLY DI CONTAINER", asdass.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", asdas.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", asdass.hashCode().toString())
 
-		SimplyDILogger.d("SIMPLY DI CONTAINER", "!!!!!!!!!!!!!!")
+		Log.d("SIMPLY DI CONTAINER", "!!!!!!!!!!!!!!")
 		val a1 = simplyAndroidViewModel<Bububu>()
-		SimplyDILogger.d("SIMPLY DI CONTAINER", a1.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", a1.hashCode().toString())
 		val a2 = simplyAndroidViewModel<Bububu>()
-		SimplyDILogger.d("SIMPLY DI CONTAINER", a2.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", a2.hashCode().toString())
 		val a3 = simplyAndroidViewModel<Bububu>(key = "312")
-		SimplyDILogger.d("SIMPLY DI CONTAINER", a3.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", a3.hashCode().toString())
 		val a4 = simplyAndroidViewModel<Bububu>(key = "312")
-		SimplyDILogger.d("SIMPLY DI CONTAINER", a4.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", a4.hashCode().toString())
 		val a5 = simplyAndroidViewModel<Bububu>(key = "312")
-		SimplyDILogger.d("SIMPLY DI CONTAINER", a5.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", a5.hashCode().toString())
 		val a6 = simplyAndroidViewModel<Bububu>(key = "312")
-		SimplyDILogger.d("SIMPLY DI CONTAINER", a6.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", a6.hashCode().toString())
 		val a7 = simplyAndroidViewModel<Bububu>()
-		SimplyDILogger.d("SIMPLY DI CONTAINER", a7.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", a7.hashCode().toString())
 		val a8 = simplyAndroidViewModel<Bububu>()
-		SimplyDILogger.d("SIMPLY DI CONTAINER", a8.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", a8.hashCode().toString())
 		val a9 = simplyAndroidViewModel<Bububu>(key = "312")
-		SimplyDILogger.d("SIMPLY DI CONTAINER", a9.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", a9.hashCode().toString())
 		val a10 = simplyAndroidViewModel<Bububu>("")
-		SimplyDILogger.d("SIMPLY DI CONTAINER", a10.hashCode().toString())
-		SimplyDILogger.d("SIMPLY DI CONTAINER", "!!!!!!!!!!!!!!")
+		Log.d("SIMPLY DI CONTAINER", a10.hashCode().toString())
+		Log.d("SIMPLY DI CONTAINER", "!!!!!!!!!!!!!!")
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
 		setContent {
@@ -57,11 +57,11 @@ class MainActivity : ComponentActivity() {
 				val asdas222 = simplyComposeViewModel<Bububu>()
 				val asdas22 = simplyComposeViewModel<Bububu>()
 				val asdas2 = simplyComposeViewModel<Bububu>("1")
-				SimplyDILogger.d("SIMPLY DI CONTAINER", asdas5.hashCode().toString())
-				SimplyDILogger.d("SIMPLY DI CONTAINER", asdas50.hashCode().toString())
-				SimplyDILogger.d("SIMPLY DI CONTAINER", asdas222.hashCode().toString())
-				SimplyDILogger.d("SIMPLY DI CONTAINER", asdas22.hashCode().toString())
-				SimplyDILogger.d("SIMPLY DI CONTAINER", asdas2.hashCode().toString())
+				Log.d("SIMPLY DI CONTAINER", asdas5.hashCode().toString())
+				Log.d("SIMPLY DI CONTAINER", asdas50.hashCode().toString())
+				Log.d("SIMPLY DI CONTAINER", asdas222.hashCode().toString())
+				Log.d("SIMPLY DI CONTAINER", asdas22.hashCode().toString())
+				Log.d("SIMPLY DI CONTAINER", asdas2.hashCode().toString())
 				Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 					val asdasss by inject<Bububu>(scopeName = "1")
 					Greeting(
@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
 	val asdas = simplyComposeViewModel<Bububu>(key = "4")
-	SimplyDILogger.d("SIMPLY DI CONTAINER", asdas.hashCode().toString())
+	Log.d("SIMPLY DI CONTAINER", asdas.hashCode().toString())
 	Text(
 		text = "Hello $name!",
 		modifier = modifier

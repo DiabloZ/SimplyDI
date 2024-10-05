@@ -2,6 +2,8 @@ package su.vi.simply.di.core
 
 import su.vi.simply.di.core.error.SimplyDINotFoundException
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
+import su.vi.simply.di.core.utils.SimplyLogLevel
+import su.vi.simply.di.core.utils.toSimplyDILogger
 import kotlin.concurrent.thread
 import kotlin.reflect.KClass
 import kotlin.time.ExperimentalTime
@@ -15,6 +17,7 @@ public class SimplyDIContainer private constructor() {
 
 	private val mapContainers = mutableMapOf<String, SimplyDIScope>()
 	private val chainedScopes = mutableMapOf<String, MutableList<List<String>>>()
+	private var logger: SimplyDILogger = SimplyDILoggerEmpty()
 
 	/**
 	 * Метод для первичной инициализации, является корнем зависомостей,
@@ -22,15 +25,17 @@ public class SimplyDIContainer private constructor() {
 	 */
 	internal fun initialize(
 		scopeName: String = DEFAULT_SCOPE_NAME,
+		simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
 		isSearchInScope: Boolean = true,
 	): Unit = synchronized(this) {
+		logger = simplyLogLevel.toSimplyDILogger()
 		if (mapContainers.containsKey(scopeName)) {
-			SimplyDILogger.e(TAG, String.format(LOG_INIT_ALREADY, scopeName))
+			logger.e(TAG, String.format(LOG_INIT_ALREADY, scopeName))
 			return
 		}
 		mapContainers[scopeName] = SimplyDIScope(scopeName = scopeName, isSearchInScope = isSearchInScope)
 
-		SimplyDILogger.d(TAG, String.format(LOG_INIT, scopeName))
+		logger.d(TAG, String.format(LOG_INIT, scopeName))
 	}
 
 	@Throws(SimplyDINotFoundException::class)
@@ -40,7 +45,7 @@ public class SimplyDIContainer private constructor() {
 		factory: () -> T,
 	): Unit = synchronized(this) {
 		if (isDependencyInScope(scopeName = scopeName, clazz = clazz)){
-			SimplyDILogger.e(TAG, String.format(REPLACE_ERR, clazz, scopeName))
+			logger.e(TAG, String.format(REPLACE_ERR, clazz, scopeName))
 			return@synchronized
 		}
 		mapContainers[scopeName]?.createDependencyNow(
@@ -51,7 +56,7 @@ public class SimplyDIContainer private constructor() {
 				String.format(TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED, clazz, scopeName)
 			)
 		}
-		SimplyDILogger.d(TAG, "$CREATE_DEP_IMMEDIATELY${clazz}")
+		logger.d(TAG, "$CREATE_DEP_IMMEDIATELY${clazz}")
 	}
 
 	/**
@@ -66,7 +71,7 @@ public class SimplyDIContainer private constructor() {
 		factory: () -> T,
 	): Unit = synchronized(this) {
 		if (isDependencyInScope(scopeName = scopeName, clazz = clazz)){
-			SimplyDILogger.e(TAG, String.format(REPLACE_ERR, clazz, scopeName))
+			logger.e(TAG, String.format(REPLACE_ERR, clazz, scopeName))
 			return@synchronized
 		}
 		mapContainers[scopeName]?.createDependencyLater(
@@ -77,7 +82,7 @@ public class SimplyDIContainer private constructor() {
 				String.format(TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED, clazz, scopeName)
 			)
 		}
-		SimplyDILogger.d(TAG, "$CREATE_DEP_LAZY${clazz}")
+		logger.d(TAG, "$CREATE_DEP_LAZY${clazz}")
 	}
 
 	public fun <T : Any> replaceDependencyNow(
@@ -107,10 +112,10 @@ public class SimplyDIContainer private constructor() {
 	): Unit = synchronized(this) {
 		mapContainers[scopeName]?.apply {
 			delete(clazz)
-			SimplyDILogger.d(TAG, "$DELETE_DEP${clazz}")
+			logger.d(TAG, "$DELETE_DEP${clazz}")
 			return@synchronized
 		}
-		SimplyDILogger.d(TAG, "$DELETE_DEP_ERR${clazz}")
+		logger.d(TAG, "$DELETE_DEP_ERR${clazz}")
 	}
 
 	/**
@@ -123,7 +128,7 @@ public class SimplyDIContainer private constructor() {
 		clazz: KClass<*>,
 		scopeName: String = DEFAULT_SCOPE_NAME,
 	): T {
-		SimplyDILogger.d(TAG, "$GET_DEP_SINGLE${clazz}")
+		logger.d(TAG, "$GET_DEP_SINGLE${clazz}")
 		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
 		return scope.getNullableDependency(clazz)
 			?: findInChainScopes(
@@ -143,7 +148,7 @@ public class SimplyDIContainer private constructor() {
 		clazz: KClass<*>,
 		scopeName: String = DEFAULT_SCOPE_NAME,
 	): T {
-		SimplyDILogger.d(TAG, "$GET_DEP_FACTORY${clazz} ")
+		logger.d(TAG, "$GET_DEP_FACTORY${clazz} ")
 		return mapContainers[scopeName]?.getFactoryDependency(clazz = clazz)
 			?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
 	}
@@ -154,7 +159,7 @@ public class SimplyDIContainer private constructor() {
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		clazz: KClass<*>,
 	): T {
-		SimplyDILogger.d(TAG, "$GET_DEP_FACTORY_WITH_ERROR${clazz}")
+		logger.d(TAG, "$GET_DEP_FACTORY_WITH_ERROR${clazz}")
 		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
 		return scope.getByClass(clazz)
 			?: mapContainers.asSequence()
@@ -173,7 +178,7 @@ public class SimplyDIContainer private constructor() {
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		clazz: KClass<*>,
 	): T? {
-		SimplyDILogger.d(TAG, "$GET_DEP_FACTORY_NULLABLE${clazz}")
+		logger.d(TAG, "$GET_DEP_FACTORY_NULLABLE${clazz}")
 		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
 		return scope.getByClass(clazz)
 	}
@@ -181,7 +186,7 @@ public class SimplyDIContainer private constructor() {
 	internal fun addChainScopes(
 		listOfScopes: List<String>
 	): Unit = synchronized(this) {
-		SimplyDILogger.d(TAG, String.format(LOG_INIT_CHAIN, listOfScopes.joinToString(prefix = "\"", separator = "\", \"", postfix = "\"")))
+		logger.d(TAG, String.format(LOG_INIT_CHAIN, listOfScopes.joinToString(prefix = "\"", separator = "\", \"", postfix = "\"")))
 		listOfScopes.forEach { scopeName ->
 			val scope = chainedScopes[scopeName] ?: mutableListOf()
 			scope.add(listOfScopes)
@@ -192,7 +197,7 @@ public class SimplyDIContainer private constructor() {
 	internal fun deleteChainedScopes(
 		listOfScopes: List<String>
 	): Unit = synchronized(this) {
-		SimplyDILogger.d(TAG, String.format(LOG_DELETE_CHAIN, listOfScopes.joinToString(prefix = "\"", separator = "\", \"", postfix = "\"")))
+		logger.d(TAG, String.format(LOG_DELETE_CHAIN, listOfScopes.joinToString(prefix = "\"", separator = "\", \"", postfix = "\"")))
 		listOfScopes.forEach { scopeName ->
 			chainedScopes[scopeName]?.remove(listOfScopes)
 		}
@@ -260,13 +265,13 @@ public class SimplyDIContainer private constructor() {
 				mainusuTimer += usuTimer
 				mainseqTimer += seqTimer
 				mainsyncTimer += syncTimer
-				SimplyDILogger.wtf(TAG, "asSequence -  ${seqTimer / times} μs")
-				SimplyDILogger.wtf(TAG, "usualArray -  ${usuTimer / times} μs")
-				SimplyDILogger.wtf(TAG, "syncTimer -  ${syncTimer / times} μs")
+				logger.wtf(TAG, "asSequence -  ${seqTimer / times} μs")
+				logger.wtf(TAG, "usualArray -  ${usuTimer / times} μs")
+				logger.wtf(TAG, "syncTimer -  ${syncTimer / times} μs")
 			}
-			SimplyDILogger.wtf(TAG, "Main asSequence -  ${mainseqTimer/(mainTimes *times)} μs")
-			SimplyDILogger.wtf(TAG, "Main usualArray -  ${mainusuTimer/(mainTimes *times)} μs")
-			SimplyDILogger.wtf(TAG, "Main syncTimer -  ${mainsyncTimer/(mainTimes *times)} μs")
+			logger.wtf(TAG, "Main asSequence -  ${mainseqTimer/(mainTimes *times)} μs")
+			logger.wtf(TAG, "Main usualArray -  ${mainusuTimer/(mainTimes *times)} μs")
+			logger.wtf(TAG, "Main syncTimer -  ${mainsyncTimer/(mainTimes *times)} μs")
 		}
 	}
 
