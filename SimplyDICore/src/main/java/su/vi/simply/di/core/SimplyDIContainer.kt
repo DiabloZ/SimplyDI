@@ -84,7 +84,7 @@ public class SimplyDIContainer private constructor() {
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		clazz: KClass<*>,
 		factory: () -> T,
-	): Unit {
+	) {
 		deleteDependency(clazz = clazz, scopeName = scopeName)
 		addDependencyNow(scopeName = scopeName, clazz = clazz, factory = factory)
 	}
@@ -93,7 +93,7 @@ public class SimplyDIContainer private constructor() {
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		clazz: KClass<*>,
 		factory: () -> T,
-	): Unit {
+	) {
 		deleteDependency(clazz = clazz, scopeName = scopeName)
 		addDependencyLater(scopeName = scopeName, clazz = clazz, factory = factory)
 	}
@@ -175,7 +175,7 @@ public class SimplyDIContainer private constructor() {
 	): T? {
 		SimplyDILogger.d(TAG, "$GET_DEP_FACTORY_NULLABLE${clazz}")
 		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
-		return scope.getByClass<T>(clazz)
+		return scope.getByClass(clazz)
 	}
 
 	internal fun addChainScopes(
@@ -221,7 +221,7 @@ public class SimplyDIContainer private constructor() {
 
 	@Suppress("UNCHECKED_CAST")
 	@OptIn(ExperimentalTime::class)
-	fun <T: Any> depBenchmark(
+	public fun <T: Any> depBenchmark(
 		clazz: KClass<*>,
 	) {
 		val mainTimes = 10
@@ -234,7 +234,6 @@ public class SimplyDIContainer private constructor() {
 				var syncTimer = 0L
 				var usuTimer = 0L
 				var seqTimer = 0L
-				var seqDifTimer = 0L
 
 				repeat(times) {
 					seqTimer += measureTime {

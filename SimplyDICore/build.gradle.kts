@@ -1,6 +1,7 @@
 plugins {
 	alias(libs.plugins.android.library)
 	alias(libs.plugins.jetbrains.kotlin.android)
+	//kotlin("jvm") version "1.8.0"
 }
 
 android {
@@ -24,14 +25,12 @@ android {
 		sourceCompatibility = JavaVersion.VERSION_1_8
 		targetCompatibility = JavaVersion.VERSION_1_8
 	}
+
 	kotlinOptions {
 		jvmTarget = JavaVersion.VERSION_1_8.toString()
+		freeCompilerArgs += "-Xexplicit-api=strict"
 	}
 
-}
-
-kotlin {
-	explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
 }
 
 dependencies {
