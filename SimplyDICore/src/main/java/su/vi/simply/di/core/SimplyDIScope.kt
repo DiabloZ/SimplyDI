@@ -122,6 +122,8 @@ internal class SimplyDIScope(
 			}
 	}
 
+	internal fun inDependencyInScope(clazz: KClass<*>) = initializerFactory.containsKey(clazz) || listOfDependencies.any { it == clazz }
+
 	companion object {
 		private const val NOT_FOUND_ERROR = "In the beginning, you need to register such a service - %s, before calling it"
 	}
