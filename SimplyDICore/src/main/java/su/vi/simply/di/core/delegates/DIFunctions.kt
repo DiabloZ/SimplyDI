@@ -14,13 +14,12 @@ import kotlin.reflect.KClass
  * @throws SimplyDINotFoundException если зависимость не будет найдена с добавлением в контейнер
  */
 @Throws(SimplyDINotFoundException::class)
-internal inline fun <reified T : Any> inject(
-    clazz: KClass<*>,
+public inline fun <reified T : Any> inject(
     scopeName: String = DEFAULT_SCOPE_NAME,
     mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
 ): Lazy<T> = lazy(mode) {
     SimplyDIContainer.instance.getDependency(
-        clazz = clazz,
+        clazz = T::class,
         scopeName = scopeName
     )
 }
