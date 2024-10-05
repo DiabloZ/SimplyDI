@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+	implementation(project(":SimplyDICore"))
 	implementation(project(":SimplyDIViewModel"))
 
 	implementation(libs.androidx.core.ktx)

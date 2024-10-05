@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.simply.di.view_model.resolveViewModel
 
 @Composable
@@ -16,7 +17,7 @@ public inline fun <reified T : ViewModel> simplyComposeViewModel(
 	viewModelStoreOwner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
 		"No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
 	},
-	scopeName: String = "Main",
+	scopeName: String = DEFAULT_SCOPE_NAME,
 ): T {
 	val viewModel: T by remember(key, qualifier) {
 		mutableStateOf(
