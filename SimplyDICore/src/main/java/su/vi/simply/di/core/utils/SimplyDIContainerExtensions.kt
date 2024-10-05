@@ -31,6 +31,29 @@ public inline fun <reified T : Any> SimplyDIContainer.addDependencyLater(
 	factory = factory
 )
 
+public inline fun <reified T : Any> SimplyDIContainer.replaceDependencyNow(
+	scopeName: String = DEFAULT_SCOPE_NAME,
+	noinline factory: () -> T,
+): Unit = replaceDependencyNow(
+	scopeName = scopeName,
+	clazz = T::class,
+	factory = factory
+)
+
+/**
+ * Метод для получения зависимости из [SimplyDIScope].
+ * @return T
+ * @throws SimplyDINotFoundException если зависимость не будет найдена
+ **/
+public inline fun <reified T : Any> SimplyDIContainer.replaceDependencyLater(
+	scopeName: String = DEFAULT_SCOPE_NAME,
+	noinline factory: () -> T,
+): Unit = replaceDependencyLater(
+	scopeName = scopeName,
+	clazz = T::class,
+	factory = factory
+)
+
 /**
  * Метод для получения зависимости из [SimplyDIScope].
  * @return T

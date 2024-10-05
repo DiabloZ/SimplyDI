@@ -39,6 +39,10 @@ public class SimplyDIContainer private constructor() {
 		clazz: KClass<*>,
 		factory: () -> T,
 	): Unit = synchronized(this) {
+		if (isDependencyInScope(scopeName = scopeName, clazz = clazz)){
+			SimplyDILogger.e(TAG, String.format(REPLACE_ERR, clazz, scopeName))
+			return@synchronized
+		}
 		mapContainers[scopeName]?.createDependencyNow(
 			clazz = clazz,
 			factory = factory
@@ -61,6 +65,10 @@ public class SimplyDIContainer private constructor() {
 		clazz: KClass<*>,
 		factory: () -> T,
 	): Unit = synchronized(this) {
+		if (isDependencyInScope(scopeName = scopeName, clazz = clazz)){
+			SimplyDILogger.e(TAG, String.format(REPLACE_ERR, clazz, scopeName))
+			return@synchronized
+		}
 		mapContainers[scopeName]?.createDependencyLater(
 			clazz = clazz,
 			factory = factory
@@ -70,6 +78,24 @@ public class SimplyDIContainer private constructor() {
 			)
 		}
 		SimplyDILogger.d(TAG, "$CREATE_DEP_LAZY${clazz}")
+	}
+
+	public fun <T : Any> replaceDependencyNow(
+		scopeName: String = DEFAULT_SCOPE_NAME,
+		clazz: KClass<*>,
+		factory: () -> T,
+	): Unit {
+		deleteDependency(clazz = clazz, scopeName = scopeName)
+		addDependencyNow(scopeName = scopeName, clazz = clazz, factory = factory)
+	}
+
+	public fun <T : Any> replaceDependencyLater(
+		scopeName: String = DEFAULT_SCOPE_NAME,
+		clazz: KClass<*>,
+		factory: () -> T,
+	): Unit {
+		deleteDependency(clazz = clazz, scopeName = scopeName)
+		addDependencyLater(scopeName = scopeName, clazz = clazz, factory = factory)
 	}
 
 	/**
@@ -172,6 +198,11 @@ public class SimplyDIContainer private constructor() {
 		}
 	}
 
+	private fun isDependencyInScope(
+		clazz: KClass<*>,
+		scopeName: String = DEFAULT_SCOPE_NAME
+	): Boolean = mapContainers[scopeName]?.isDependencyInScope(clazz = clazz) == true
+
 	private fun <T : Any> findInChainScopes(
 		clazz: KClass<*>,
 		scopeName: String = DEFAULT_SCOPE_NAME,
@@ -230,13 +261,13 @@ public class SimplyDIContainer private constructor() {
 				mainusuTimer += usuTimer
 				mainseqTimer += seqTimer
 				mainsyncTimer += syncTimer
-				SimplyDILogger.e(TAG, "asSequence -  ${seqTimer / times} μs")
-				SimplyDILogger.e(TAG, "usualArray -  ${usuTimer / times} μs")
-				SimplyDILogger.e(TAG, "syncTimer -  ${syncTimer / times} μs")
+				SimplyDILogger.wtf(TAG, "asSequence -  ${seqTimer / times} μs")
+				SimplyDILogger.wtf(TAG, "usualArray -  ${usuTimer / times} μs")
+				SimplyDILogger.wtf(TAG, "syncTimer -  ${syncTimer / times} μs")
 			}
-			SimplyDILogger.e(TAG, "Main asSequence -  ${mainseqTimer/(mainTimes *times)} μs")
-			SimplyDILogger.e(TAG, "Main usualArray -  ${mainusuTimer/(mainTimes *times)} μs")
-			SimplyDILogger.e(TAG, "Main syncTimer -  ${mainsyncTimer/(mainTimes *times)} μs")
+			SimplyDILogger.wtf(TAG, "Main asSequence -  ${mainseqTimer/(mainTimes *times)} μs")
+			SimplyDILogger.wtf(TAG, "Main usualArray -  ${mainusuTimer/(mainTimes *times)} μs")
+			SimplyDILogger.wtf(TAG, "Main syncTimer -  ${mainsyncTimer/(mainTimes *times)} μs")
 		}
 	}
 
@@ -263,6 +294,7 @@ public class SimplyDIContainer private constructor() {
 		private const val GET_DEP_FACTORY_WITH_ERROR = "Запрошена зависимость без добавления с ошибкой - "
 		private const val GET_DEP_FACTORY_NULLABLE = "Запрошена зависимость без добавления нулабельно - "
 		private const val NOT_FOUND_ERROR = "In the beginning, you need to register such a service - %s, before calling it"
+		private const val REPLACE_ERR = "You want to replace - \"%s\" in scope \"%s\"?\nPls try the methods - \"replaceNow\"|\"replaceLater\"."
 		public val instance: SimplyDIContainer = SimplyDIContainer()
 	}
 }

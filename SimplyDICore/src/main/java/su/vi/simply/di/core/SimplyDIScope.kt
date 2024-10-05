@@ -40,16 +40,9 @@ internal class SimplyDIScope(
 	 * @return T
 	 * @throws SimplyDINotFoundException если зависимость не будет найдена
 	 **/
-	@Suppress("UNCHECKED_CAST")
 	@Throws(SimplyDINotFoundException::class)
 	internal fun <T: Any> getDependency(clazz: KClass<*>): T {
-		val dependency = listOfDependencies.find { dependency -> dependency::class == clazz } ?: run {
-			val newInstance = initializerFactory[clazz]?.invoke()
-				?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, clazz.simpleName))
-			listOfDependencies.add(newInstance)
-			newInstance
-		}
-		return (dependency as? T)
+		return getNullableDependency<T>(clazz = clazz)
 			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, clazz.simpleName))
 	}
 
@@ -122,7 +115,9 @@ internal class SimplyDIScope(
 			}
 	}
 
-	internal fun inDependencyInScope(clazz: KClass<*>) = initializerFactory.containsKey(clazz) || listOfDependencies.any { it == clazz }
+	internal fun isDependencyInScope(clazz: KClass<*>): Boolean {
+		return initializerFactory.containsKey(clazz) || listOfDependencies.any { it == clazz }
+	}
 
 	companion object {
 		private const val NOT_FOUND_ERROR = "In the beginning, you need to register such a service - %s, before calling it"

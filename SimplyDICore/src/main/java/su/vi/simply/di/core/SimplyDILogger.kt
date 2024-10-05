@@ -9,4 +9,7 @@ public object SimplyDILogger {
 	public fun e(tag: String, text: String, throwable: Throwable? = null) {
 		Log.e(tag, text, throwable)
 	}
+	public fun wtf(tag: String, text: String, throwable: Throwable? = null) {
+		Log.wtf(tag, text, throwable)
+	}
 }
