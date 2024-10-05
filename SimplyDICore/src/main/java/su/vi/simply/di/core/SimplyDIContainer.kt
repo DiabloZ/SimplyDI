@@ -163,6 +163,15 @@ public class SimplyDIContainer private constructor() {
 		}
 	}
 
+	internal fun deleteChainedScopes(
+		listOfScopes: List<String>
+	): Unit = synchronized(this) {
+		SimplyDILogger.d(TAG, String.format(LOG_DELETE_CHAIN, listOfScopes.joinToString(prefix = "\"", separator = "\", \"", postfix = "\"")))
+		listOfScopes.forEach { scopeName ->
+			chainedScopes[scopeName]?.remove(listOfScopes)
+		}
+	}
+
 	private fun <T : Any> findInChainScopes(
 		clazz: KClass<*>,
 		scopeName: String = DEFAULT_SCOPE_NAME,
@@ -186,10 +195,12 @@ public class SimplyDIContainer private constructor() {
 	) {
 		val mainTimes = 10
 		val times = 100
+		var mainsyncTimer = 0L
 		var mainusuTimer = 0L
 		var mainseqTimer = 0L
 		thread {
 			repeat(mainTimes) {
+				var syncTimer = 0L
 				var usuTimer = 0L
 				var seqTimer = 0L
 
@@ -210,13 +221,21 @@ public class SimplyDIContainer private constructor() {
 							.firstOrNull() as? T
 					}.inWholeNanoseconds
 				}
+				repeat(times){
+					syncTimer += measureTime {
+						getDependency(clazz)
+					}.inWholeNanoseconds
+				}
 				mainusuTimer += usuTimer
 				mainseqTimer += seqTimer
+				mainsyncTimer += syncTimer
 				SimplyDILogger.e(TAG, "asSequence -  ${seqTimer / times}")
 				SimplyDILogger.e(TAG, "usualArray -  ${usuTimer / times}")
+				SimplyDILogger.e(TAG, "syncTimer -  ${syncTimer / times}")
 			}
 			SimplyDILogger.e(TAG, "Main asSequence -  ${mainseqTimer/(mainTimes *times)}")
 			SimplyDILogger.e(TAG, "Main usualArray -  ${mainusuTimer/(mainTimes *times)}")
+			SimplyDILogger.e(TAG, "Main syncTimer -  ${mainsyncTimer/(mainTimes *times)}")
 		}
 	}
 
@@ -224,7 +243,8 @@ public class SimplyDIContainer private constructor() {
 		private const val TAG = "SIMPLY DI CONTAINER"
 
 		private const val LOG_INIT = "Scope with name - %s has been initialized"
-		private const val LOG_INIT_CHAIN = "Created chain with scopes - %s"
+		private const val LOG_INIT_CHAIN = "Created a chain with scopes - %s"
+		private const val LOG_DELETE_CHAIN = "Deleted a chain with scopes - %s"
 		private const val LOG_INIT_ALREADY = "Scope with name - %s has already been initialized"
 		private const val SCOPE_IS_NOT_INITIALIZED = "∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇\n" +
 			"|||||||||||||||| 1.Scope is not initialized.\n" +

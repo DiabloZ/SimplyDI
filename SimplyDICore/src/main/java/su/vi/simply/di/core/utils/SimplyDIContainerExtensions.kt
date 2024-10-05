@@ -78,6 +78,10 @@ public fun SimplyDIContainer.addChainScopes(listOfScopes: List<String>){
 	addChainScopes(listOfScopes)
 }
 
+public fun SimplyDIContainer.deleteChainedScopes(listOfScopes: List<String>){
+	deleteChainedScopes(listOfScopes)
+}
+
 public fun SimplyDIContainer.initialize(
 	scopeName: String = DEFAULT_SCOPE_NAME,
 	isSearchInScope: Boolean = true,

@@ -13,8 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import su.vi.simply.di.android.simplyAndroidViewModel
 import su.vi.simply.di.compose.simplyComposeViewModel
+import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.SimplyDILogger
 import su.vi.simply.di.core.delegates.inject
+import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
+import su.vi.simply.di.core.utils.addChainScopes
+import su.vi.simply.di.core.utils.deleteChainedScopes
 import su.vi.simplydiapp.for_test.Bububu
 import su.vi.simplydiapp.ui.theme.SimplyDITheme
 
@@ -52,6 +56,7 @@ class MainActivity : ComponentActivity() {
 		setContent {
 			SimplyDITheme {
 				val asdas5 = simplyComposeViewModel<Bububu>(scopeName = "5")
+				val asdas50 = simplyComposeViewModel<Bububu>(scopeName = "5", key = "!!!")
 				val asdas222 = simplyComposeViewModel<Bububu>()
 				val asdas22 = simplyComposeViewModel<Bububu>()
 				val asdas2 = simplyComposeViewModel<Bububu>("1")
