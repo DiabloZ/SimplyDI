@@ -1,25 +1,27 @@
 package su.vi.simply.di.android
 
+import android.app.Application
 import android.content.Context
+import android.content.res.Resources
 import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
+import su.vi.simply.di.core.utils.SimplyDIContainerBuilder
 import su.vi.simply.di.core.utils.SimplyLogLevel
-import su.vi.simply.di.core.utils.addDependencyNow
-import su.vi.simply.di.core.utils.initialize
+import su.vi.simply.di.core.utils.initializeSimplyDIContainer
 
-/*
-class SimplyDIContainerAndroidExtensions {
-}*/
-
-public fun SimplyDIContainer.initializeAndroid(
-	context: Context,
-	simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
+public fun initializeSimplyDIAndroidContainer(
+	application: Application,
 	scopeName: String = DEFAULT_SCOPE_NAME,
-){
-	initialize(
-		scopeName = scopeName,
-		simplyLogLevel = simplyLogLevel
-	)
-	addDependencyNow(scopeName = scopeName) { context }
-	addDependencyNow(scopeName = scopeName) { context.resources }
+	simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
+	isSearchInScope: Boolean = true,
+	builder: SimplyDIContainerBuilder.() -> Unit,
+): SimplyDIContainer = initializeSimplyDIContainer(
+	scopeName = scopeName,
+	simplyLogLevel = simplyLogLevel,
+	isSearchInScope = isSearchInScope
+) {
+	addDependencyNow<Context> { application }
+	addDependencyNow<Application> { application }
+	addDependencyNow<Resources> { application.resources }
+	builder.invoke(this)
 }

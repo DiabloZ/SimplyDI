@@ -29,9 +29,14 @@ public class SimplyDIContainer(
 		isSearchInScope: Boolean = true,
 	): Unit = synchronized(this) {
 		logger = simplyLogLevel.toSimplyDILogger()
-		if (mapContainers.containsKey(scopeName) && scopeName != DEFAULT_SCOPE_NAME) {
-			logger.e(TAG, String.format(LOG_INIT_ALREADY, scopeName))
-			return
+		when {
+			mapContainers.containsKey(scopeName) && scopeName != DEFAULT_SCOPE_NAME -> {
+				logger.e(TAG, String.format(LOG_INIT_ALREADY, scopeName))
+				return
+			}
+			mapContainers.containsKey(scopeName) && scopeName == DEFAULT_SCOPE_NAME -> {
+				return
+			}
 		}
 		mapContainers[scopeName] = SimplyDIScope(scopeName = scopeName, isSearchInScope = isSearchInScope)
 
@@ -301,7 +306,7 @@ public class SimplyDIContainer(
 		private const val GET_DEP_FACTORY_WITH_ERROR = "Запрошена зависимость без добавления с ошибкой - "
 		private const val GET_DEP_FACTORY_NULLABLE = "Запрошена зависимость без добавления нулабельно - "
 		private const val NOT_FOUND_ERROR = "In the beginning, you need to register such a service - %s, before calling it"
-		private const val REPLACE_ERR = "You want to replace - \"%s\" in scope \"%s\"?\nPls try the methods - \"replaceNow\"|\"replaceLater\"."
+		private const val REPLACE_ERR = "You try to replace - \"%s\" in scope \"%s\"?\nPls try the methods - \"replaceNow\"|\"replaceLater\"."
 
 
 		public val instance: SimplyDIContainer by lazy {

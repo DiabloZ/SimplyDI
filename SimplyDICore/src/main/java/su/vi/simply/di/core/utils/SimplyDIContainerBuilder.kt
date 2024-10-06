@@ -1,6 +1,7 @@
 package su.vi.simply.di.core.utils
 
 import su.vi.simply.di.core.SimplyDIContainer
+import su.vi.simply.di.core.error.SimplyDINotFoundException
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 
 public class SimplyDIContainerBuilder {
@@ -18,7 +19,7 @@ public class SimplyDIContainerBuilder {
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
 		isSearchInScope: Boolean = true,
-		builder: SimplyDIContainerBuilder.() -> Unit
+		builder: SimplyDIContainerBuilder.() -> Unit,
 	): SimplyDIContainer {
 		this.scopeName = scopeName
 		simplyDIContainer.initialize(
@@ -30,23 +31,54 @@ public class SimplyDIContainerBuilder {
 		return simplyDIContainer
 	}
 
-
 	public inline fun <reified T : Any> addDependencyNow(
 		noinline factory: () -> T,
-	) {
-		simplyDIContainer.addDependencyNow(
-			scopeName = scopeName,
-			clazz = T::class,
-			factory = factory
-		)
-	}
+	): Unit = simplyDIContainer.addDependencyNow<T>(
+		scopeName = scopeName,
+		factory = factory
+	)
+
+	public inline fun <reified T : Any> addDependencyLater(
+		noinline factory: () -> T,
+	): Unit = simplyDIContainer.addDependencyLater<T>(
+		scopeName = scopeName,
+		factory = factory
+	)
+
+	public inline fun <reified T : Any> replaceDependencyNow(
+		noinline factory: () -> T,
+	): Unit = simplyDIContainer.replaceDependencyNow<T>(
+		scopeName = scopeName,
+		factory = factory
+	)
+
+	public inline fun <reified T : Any> replaceDependencyLater(
+		noinline factory: () -> T,
+	): Unit = simplyDIContainer.replaceDependencyLater<T>(
+		scopeName = scopeName,
+		factory = factory
+	)
+
+	@Throws(SimplyDINotFoundException::class)
+	public inline fun <reified T> getDependency(): T = simplyDIContainer.getDependency<T>(
+		scopeName = scopeName
+	)
+
+	@Throws(SimplyDINotFoundException::class)
+	public inline fun <reified T> getFactoryDependency(): T = simplyDIContainer.getFactoryDependency<T>(
+		scopeName = scopeName
+	)
+
+	public inline fun <reified T : Any> deleteDependency(): Unit = simplyDIContainer.deleteDependency<T>(
+		scopeName = scopeName
+	)
 }
 
 public fun initializeSimplyDIContainer(
 	scopeName: String = DEFAULT_SCOPE_NAME,
 	simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
 	isSearchInScope: Boolean = true,
-	builder: SimplyDIContainerBuilder.() -> Unit
+	builder: SimplyDIContainerBuilder.() -> Unit,
 ): SimplyDIContainer {
 	val containerBuilder = SimplyDIContainerBuilder()
 
