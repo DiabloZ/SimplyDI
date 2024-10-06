@@ -13,7 +13,10 @@ import kotlin.time.measureTime
  * Singletone контейнер с [SimplyDIScope], нужен для первичной инициализации и получения зависимостей
  * по всему приложению.
  */
-public class SimplyDIContainer {
+public class SimplyDIContainer(
+	public val scopeName: String,
+	public val isSearchInScope: Boolean
+){
 	private var logger: SimplyDILogger = SimplyDILoggerEmpty()
 
 	/**
@@ -299,6 +302,10 @@ public class SimplyDIContainer {
 		private const val GET_DEP_FACTORY_NULLABLE = "Запрошена зависимость без добавления нулабельно - "
 		private const val NOT_FOUND_ERROR = "In the beginning, you need to register such a service - %s, before calling it"
 		private const val REPLACE_ERR = "You want to replace - \"%s\" in scope \"%s\"?\nPls try the methods - \"replaceNow\"|\"replaceLater\"."
-		public val instance: SimplyDIContainer = SimplyDIContainer()
+
+
+		public val instance: SimplyDIContainer by lazy {
+			SimplyDIContainer(scopeName = DEFAULT_SCOPE_NAME, isSearchInScope = true)
+		}
 	}
 }
