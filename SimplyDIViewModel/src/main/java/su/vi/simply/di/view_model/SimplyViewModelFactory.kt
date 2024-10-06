@@ -13,6 +13,7 @@ public class SimplyViewModelFactory(
 	private val scopeName: String = DEFAULT_SCOPE_NAME,
 ) : ViewModelProvider.Factory {
 
+	@Suppress("DEPRECATION")
 	@Throws(SimplyDINotFoundException::class)
 	override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
 		return SimplyDIContainer.instance.getByClassAnyway(clazz = clazz, scopeName = scopeName)

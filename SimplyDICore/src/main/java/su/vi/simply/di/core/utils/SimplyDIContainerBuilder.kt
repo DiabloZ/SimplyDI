@@ -22,10 +22,10 @@ public class SimplyDIContainerBuilder {
 		builder: SimplyDIContainerBuilder.() -> Unit,
 	): SimplyDIContainer {
 		this.scopeName = scopeName
-		simplyDIContainer.initialize(
-			scopeName = scopeName,
-			simplyLogLevel = simplyLogLevel,
-			isSearchInScope = isSearchInScope
+		simplyDIContainer.initializeContainer(
+			scopeName,
+			simplyLogLevel,
+			isSearchInScope
 		)
 		builder.invoke(this)
 		return simplyDIContainer
@@ -72,6 +72,16 @@ public class SimplyDIContainerBuilder {
 	public inline fun <reified T : Any> deleteDependency(): Unit = simplyDIContainer.deleteDependency<T>(
 		scopeName = scopeName
 	)
+
+	@Suppress("DEPRECATION")
+	public fun addChainScopes(listOfScopes: List<String>): Unit = simplyDIContainer.addChainScopes(
+		listOfScopes = listOfScopes
+	)
+
+	@Suppress("DEPRECATION")
+	public fun deleteChainedScopes(listOfScopes: List<String>): Unit = simplyDIContainer.deleteChainedScopes(
+		listOfScopes = listOfScopes
+	)
 }
 
 public fun initializeSimplyDIContainer(
@@ -89,15 +99,3 @@ public fun initializeSimplyDIContainer(
 		builder = builder
 	)
 }
-
-/*
-public fun main (){
-	val test = initializeSimplyDIContainer(
-		scopeName = "abc",
-		simplyLogLevel = SimplyLogLevel.EMPTY,
-		isSearchInScope = false,
-	) {
-		addDependencyNow { "Something" }
-	}
-	test
-}*/

@@ -3,7 +3,7 @@ package su.vi.simply.di.core.delegates
 import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.error.SimplyDINotFoundException
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
-import kotlin.reflect.KClass
+import su.vi.simply.di.core.utils.getDependency
 
 /**
  * Делегат для ленивого получения зависимостей из [SimplyDIContainer] в любом месте, если она в нём есть.
@@ -15,12 +15,20 @@ import kotlin.reflect.KClass
  */
 @Throws(SimplyDINotFoundException::class)
 public inline fun <reified T : Any> inject(
-    scopeName: String = DEFAULT_SCOPE_NAME,
-    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
+	scopeName: String = DEFAULT_SCOPE_NAME,
+	mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
 ): Lazy<T> = lazy(mode) {
-    SimplyDIContainer.instance.getDependency(
-        clazz = T::class,
-        scopeName = scopeName
-    )
+	SimplyDIContainer.instance.getDependency<T>(
+		scopeName = scopeName
+	)
 }
 
+@Throws(SimplyDINotFoundException::class)
+public inline fun <reified T : Any> inject(
+	container: SimplyDIContainer = SimplyDIContainer.instance,
+	mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
+): Lazy<T> = lazy(mode) {
+	container.getDependency<T>(
+		scopeName = container.scopeName
+	)
+}
