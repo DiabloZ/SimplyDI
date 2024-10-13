@@ -1,7 +1,24 @@
 package su.vi.simply.di.core
 
 import su.vi.simply.di.core.error.SimplyDINotFoundException
+import su.vi.simply.di.core.utils.SimplyDIConstants.CREATE_DEP_IMMEDIATELY
+import su.vi.simply.di.core.utils.SimplyDIConstants.CREATE_DEP_LAZY
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
+import su.vi.simply.di.core.utils.SimplyDIConstants.DELETE_DEP
+import su.vi.simply.di.core.utils.SimplyDIConstants.DELETE_DEP_ERR
+import su.vi.simply.di.core.utils.SimplyDIConstants.GET_DEP_FACTORY
+import su.vi.simply.di.core.utils.SimplyDIConstants.GET_DEP_FACTORY_NULLABLE
+import su.vi.simply.di.core.utils.SimplyDIConstants.GET_DEP_FACTORY_WITH_ERROR
+import su.vi.simply.di.core.utils.SimplyDIConstants.GET_DEP_SINGLE
+import su.vi.simply.di.core.utils.SimplyDIConstants.LOG_DELETE_CHAIN
+import su.vi.simply.di.core.utils.SimplyDIConstants.LOG_INIT
+import su.vi.simply.di.core.utils.SimplyDIConstants.LOG_INIT_ALREADY
+import su.vi.simply.di.core.utils.SimplyDIConstants.LOG_INIT_CHAIN
+import su.vi.simply.di.core.utils.SimplyDIConstants.NOT_FOUND_ERROR
+import su.vi.simply.di.core.utils.SimplyDIConstants.REPLACE_ERR
+import su.vi.simply.di.core.utils.SimplyDIConstants.SCOPE_IS_NOT_INITIALIZED
+import su.vi.simply.di.core.utils.SimplyDIConstants.TAG
+import su.vi.simply.di.core.utils.SimplyDIConstants.TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED
 import su.vi.simply.di.core.utils.SimplyLogLevel
 import su.vi.simply.di.core.utils.toSimplyDILogger
 import kotlin.concurrent.thread
@@ -10,8 +27,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 /**
- * Singletone контейнер с [SimplyDIScope], нужен для первичной инициализации и получения зависимостей
- * по всему приложению.
+ * Container with ScopesStorage, needed for get dependency through project.
  */
 public class SimplyDIContainer(
 	public val scopeName: String,
@@ -20,8 +36,11 @@ public class SimplyDIContainer(
 	private var logger: SimplyDILogger = SimplyDILoggerEmpty()
 
 	/**
-	 * Метод для первичной инициализации, является корнем зависомостей,
-	 * должен находится максимально близкНеймы в скопах не нужны.о к app context.
+	 * Initialize method for new container.
+	 * @param scopeName name of new container
+	 * @param simplyLogLevel - [SimplyLogLevel] where you can set level of logs for you needs for example for release
+	 * would do use [SimplyLogLevel.EMPTY] for debug [SimplyLogLevel.FULL].
+	 * @param isSearchInScope if you want to use this container like data store or you need to share dependencies from this container you would set value like true.
 	 */
 	@Deprecated(
 		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
@@ -286,7 +305,7 @@ public class SimplyDIContainer(
 			TAG,
 			String.format(
 				LOG_INIT_CHAIN,
-				listOfScopes.joinToString(prefix = "\"", separator = "\", \"", postfix = "\"")
+				listOfScopes.logString()
 			)
 		)
 		listOfScopes.forEach { scopeName ->
@@ -311,7 +330,7 @@ public class SimplyDIContainer(
 			TAG,
 			String.format(
 				LOG_DELETE_CHAIN,
-				listOfScopes.joinToString(prefix = "\"", separator = "\", \"", postfix = "\"")
+				listOfScopes.logString()
 			)
 		)
 		listOfScopes.forEach { scopeName ->
@@ -399,37 +418,14 @@ public class SimplyDIContainer(
 		}
 	}
 
+	private fun List<String>.logString() = joinToString(prefix = PRE_POST_QUOTES, separator = MIDDLE_QUOTES, postfix = PRE_POST_QUOTES)
+
 	public companion object {
-		private const val TAG = "SIMPLY DI CONTAINER"
+		private const val PRE_POST_QUOTES = "\""
+		private const val MIDDLE_QUOTES = "$PRE_POST_QUOTES, $PRE_POST_QUOTES"
 
 		private val mapContainers = mutableMapOf<String, SimplyDIScope>()
 		private val chainedScopes = mutableMapOf<String, MutableList<List<String>>>()
-
-		private const val LOG_INIT = "Scope with name - %s has been initialized"
-		private const val LOG_INIT_CHAIN = "Created a chain with scopes - %s"
-		private const val LOG_DELETE_CHAIN = "Deleted a chain with scopes - %s"
-		private const val LOG_INIT_ALREADY = "Scope with name - %s has already been initialized"
-		private const val SCOPE_IS_NOT_INITIALIZED = "∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇∇\n" +
-			"|||||||||||||||| 1.Scope is not initialized.\n" +
-			"|||||||||||||||| 2.It is with parameter \"isSearchInScope = false\".\n" +
-			"|||||||||||||||| 3.There isn't any dependency.\n" +
-			"|||||||||||||||| 4.You try get a dependency from other scope.\n" +
-			"|||||||||||||||| !!!WARNING scope by default is \"$DEFAULT_SCOPE_NAME\"!!! ||||||||||||||||"
-		private const val TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED =
-			"You try to create dependency !!!\"%s\"!!! in to scope with name !!!\"%s\"!!! but it's not created."
-		private const val CREATE_DEP_IMMEDIATELY = "Добавлена зависимость немеденно - "
-		private const val CREATE_DEP_LAZY = "Добавлена зависимость отложенно - "
-		private const val DELETE_DEP = "Удалена зависимость - "
-		private const val DELETE_DEP_ERR = "You try to delete dependency in not created scope"
-		private const val GET_DEP_SINGLE = "Запрошена зависимость с добавлением в контейнер - "
-		private const val GET_DEP_FACTORY = "Запрошена зависимость без добавления - "
-		private const val GET_DEP_FACTORY_WITH_ERROR = "Запрошена зависимость без добавления с ошибкой - "
-		private const val GET_DEP_FACTORY_NULLABLE = "Запрошена зависимость без добавления нулабельно - "
-		private const val NOT_FOUND_ERROR =
-			"In the beginning, you need to register such a service - %s, before calling it"
-		private const val REPLACE_ERR =
-			"You try to replace - \"%s\" in scope \"%s\"?\nPls try the methods - \"replaceNow\"|\"replaceLater\"."
-
 		public val instance: SimplyDIContainer by lazy {
 			SimplyDIContainer(scopeName = DEFAULT_SCOPE_NAME, isSearchInScope = true)
 		}

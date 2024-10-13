@@ -1,14 +1,13 @@
 package su.vi.simply.di.core
 
 import su.vi.simply.di.core.error.SimplyDINotFoundException
+import su.vi.simply.di.core.utils.SimplyDIConstants.NOT_FOUND_ERROR
 import kotlin.reflect.KClass
 
 /**
- * DI с возможностью отложенной инициализации,
- * пока генерирует только сингл-тоны.
- * также есть возможность сделать фабрики.
- *
- * @author Сухов Виталий
+ * DI Scope with lazy initialization of dependencies and fabric methods
+ * @property isSearchInScope if you want to use this container like data store or you need to share dependencies
+ * from this container you would set value like true.
  */
 internal class SimplyDIScope(
 	val isSearchInScope: Boolean
@@ -19,9 +18,9 @@ internal class SimplyDIScope(
 	private val listOfDependencies: MutableSet<Any> = mutableSetOf()
 
 	/**
-	 * Метод для получения нулабельной зависимости
-	 * @return T
-	 * @throws SimplyDINotFoundException если зависимость не будет найдена
+	 * Use it to get dependencies with store it in list of dependencies.
+	 * If the dependency not created you receive null
+	 * @return T?
 	 **/
 	@Suppress("UNCHECKED_CAST")
 	internal fun <T: Any> getNullableDependency(clazz: KClass<*>): T? {
@@ -35,9 +34,9 @@ internal class SimplyDIScope(
 	}
 
 	/**
-	 * Метод для получения зависимости
+	 * Use it to get dependencies with store it in list of dependencies.
 	 * @return T
-	 * @throws SimplyDINotFoundException если зависимость не будет найдена
+	 * @throws SimplyDINotFoundException if the dependency not created you receive
 	 **/
 	@Throws(SimplyDINotFoundException::class)
 	internal fun <T: Any> getDependency(clazz: KClass<*>): T {
@@ -45,6 +44,11 @@ internal class SimplyDIScope(
 			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, clazz.simpleName))
 	}
 
+	/**
+	 * Use it to get dependencies without store it in list of dependencies.
+	 * @return T
+	 * @throws SimplyDINotFoundException if the dependency not created you receive
+	 **/
 	@Suppress("UNCHECKED_CAST")
 	internal fun <T: Any> getFactoryDependency(clazz: KClass<*>): T {
 		return initializerFactory[clazz]?.invoke() as? T
@@ -52,7 +56,8 @@ internal class SimplyDIScope(
 	}
 
 	/**
-	 * Метод для запроса зависимости по clazz с нуллабельностью.
+	 * Use it to get dependencies without store it in list of dependencies.
+	 * If the dependency not created you receive null
 	 * @return T?
 	 **/
 	@Suppress("UNCHECKED_CAST")
@@ -63,9 +68,9 @@ internal class SimplyDIScope(
 	}
 
 	/**
-	 * Метод для запроса зависимости по clazz с ошибкой, если он не будет найден.
+	 * Use it to get dependencies without store it in list of dependencies.
 	 * @return T
-	 * @throws SimplyDINotFoundException если зависимость не будет найдена
+	 * @throws SimplyDINotFoundException if the dependency not created you receive
 	 **/
 	@Suppress("UNCHECKED_CAST")
 	internal fun <T> getByClassAnyway(
@@ -76,7 +81,7 @@ internal class SimplyDIScope(
 	}
 
 	/**
-	 * Метод для добавления инициализатора в фабрику (для отложенной инициализации)
+	 * Use it to create dependency by lazy.
 	 **/
 	internal fun <T: Any> createDependencyLater(
 		clazz: KClass<*>,
@@ -86,8 +91,7 @@ internal class SimplyDIScope(
 	}
 
 	/**
-	 * Метод для добавления зависимости сразу в set (К примеру контекст должен бысть сразу
-	 * зарегистрирован как зависимость, так как от него зависит много сервисов)
+	 * Use it to create dependency by lazy but in same time will created dependency in scope.
 	 **/
 	internal fun <T: Any> createDependencyNow(
 		clazz: KClass<*>,
@@ -100,7 +104,7 @@ internal class SimplyDIScope(
 	}
 
 	/**
-	 * Метод удаления инициализатора из фабрики и зависимости из set-а
+	 * Use it if you need to delete dependency.
 	 **/
 	internal fun delete(
 		clazz: KClass<*>,
@@ -114,12 +118,11 @@ internal class SimplyDIScope(
 			}
 	}
 
+	/**
+	 * Use it to check opportunity create the dependency.
+	 **/
 	internal fun isDependencyInScope(clazz: KClass<*>): Boolean {
 		return initializerFactory.containsKey(clazz) || listOfDependencies.any { it == clazz }
-	}
-
-	companion object {
-		private const val NOT_FOUND_ERROR = "In the beginning, you need to register such a service - %s, before calling it"
 	}
 
 }
