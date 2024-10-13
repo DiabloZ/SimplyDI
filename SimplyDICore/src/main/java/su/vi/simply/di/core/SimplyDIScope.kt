@@ -11,7 +11,6 @@ import kotlin.reflect.KClass
  * @author Сухов Виталий
  */
 internal class SimplyDIScope(
-	val scopeName: String,
 	val isSearchInScope: Boolean
 ) {
 

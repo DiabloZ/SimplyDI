@@ -10,7 +10,7 @@ import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
  **/
 @Suppress("DEPRECATION")
 public inline fun <reified T : Any> SimplyDIContainer.addDependencyNow(
-	scopeName: String = DEFAULT_SCOPE_NAME,
+	scopeName: String = this.scopeName,
 	noinline factory: () -> T,
 ): Unit = addDependencyNow(
 	scopeName = scopeName,
@@ -25,7 +25,7 @@ public inline fun <reified T : Any> SimplyDIContainer.addDependencyNow(
  **/
 @Suppress("DEPRECATION")
 public inline fun <reified T : Any> SimplyDIContainer.addDependencyLater(
-	scopeName: String = DEFAULT_SCOPE_NAME,
+	scopeName: String = this.scopeName,
 	noinline factory: () -> T,
 ): Unit = addDependencyLater(
 	scopeName = scopeName,
@@ -35,7 +35,7 @@ public inline fun <reified T : Any> SimplyDIContainer.addDependencyLater(
 
 @Suppress("DEPRECATION")
 public inline fun <reified T : Any> SimplyDIContainer.replaceDependencyNow(
-	scopeName: String = DEFAULT_SCOPE_NAME,
+	scopeName: String = this.scopeName,
 	noinline factory: () -> T,
 ): Unit = replaceDependencyNow(
 	scopeName = scopeName,
@@ -50,7 +50,7 @@ public inline fun <reified T : Any> SimplyDIContainer.replaceDependencyNow(
  **/
 @Suppress("DEPRECATION")
 public inline fun <reified T : Any> SimplyDIContainer.replaceDependencyLater(
-	scopeName: String = DEFAULT_SCOPE_NAME,
+	scopeName: String = this.scopeName,
 	noinline factory: () -> T,
 ): Unit = replaceDependencyLater(
 	scopeName = scopeName,
@@ -66,7 +66,7 @@ public inline fun <reified T : Any> SimplyDIContainer.replaceDependencyLater(
 @Suppress("DEPRECATION")
 @Throws(SimplyDINotFoundException::class)
 public inline fun <reified T> SimplyDIContainer.getDependency(
-	scopeName: String = DEFAULT_SCOPE_NAME,
+	scopeName: String = this.scopeName,
 ): T = getDependency(
 	scopeName = scopeName,
 	clazz = T::class
@@ -80,7 +80,7 @@ public inline fun <reified T> SimplyDIContainer.getDependency(
 @Suppress("DEPRECATION")
 @Throws(SimplyDINotFoundException::class)
 public inline fun <reified T> SimplyDIContainer.getFactoryDependency(
-	scopeName: String = DEFAULT_SCOPE_NAME,
+	scopeName: String = this.scopeName,
 ): T = getFactoryDependency(
 	scopeName = scopeName,
 	clazz = T::class
@@ -91,7 +91,7 @@ public inline fun <reified T> SimplyDIContainer.getFactoryDependency(
  **/
 @Suppress("DEPRECATION")
 public inline fun <reified T : Any> SimplyDIContainer.deleteDependency(
-	scopeName: String = DEFAULT_SCOPE_NAME,
+	scopeName: String = this.scopeName,
 ): Unit = deleteDependency(
 	clazz = T::class,
 	scopeName = scopeName
@@ -117,7 +117,7 @@ public fun SimplyDIContainer.deleteChainedScopes(listOfScopes: List<String>) {
 
 @Suppress("DEPRECATION")
 public fun SimplyDIContainer.initializeContainer(
-	scopeName: String = DEFAULT_SCOPE_NAME,
+	scopeName: String = this.scopeName,
 	simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
 	isSearchInScope: Boolean = true,
 ) {

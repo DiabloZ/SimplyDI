@@ -21,7 +21,7 @@ public class SimplyDIContainer(
 
 	/**
 	 * Метод для первичной инициализации, является корнем зависомостей,
-	 * должен находится максимально близко к app context.
+	 * должен находится максимально близкНеймы в скопах не нужны.о к app context.
 	 */
 	@Deprecated(
 		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
@@ -47,7 +47,7 @@ public class SimplyDIContainer(
 				return
 			}
 		}
-		mapContainers[scopeName] = SimplyDIScope(scopeName = scopeName, isSearchInScope = isSearchInScope)
+		mapContainers[scopeName] = SimplyDIScope(isSearchInScope = isSearchInScope)
 
 		logger.d(TAG, String.format(LOG_INIT, scopeName))
 	}
