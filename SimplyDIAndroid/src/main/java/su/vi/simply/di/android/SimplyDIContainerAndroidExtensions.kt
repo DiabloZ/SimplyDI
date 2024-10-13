@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.res.Resources
 import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
-import su.vi.simply.di.core.utils.SimplyDIContainerBuilder
+import su.vi.simply.di.core.utils.SimplyDIContainerDSL
 import su.vi.simply.di.core.utils.SimplyLogLevel
 import su.vi.simply.di.core.utils.initializeSimplyDIContainer
 
@@ -14,7 +14,7 @@ public fun initializeSimplyDIAndroidContainer(
 	scopeName: String = DEFAULT_SCOPE_NAME,
 	simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
 	isSearchInScope: Boolean = true,
-	builder: SimplyDIContainerBuilder.() -> Unit,
+	builder: SimplyDIContainerDSL.() -> Unit,
 ): SimplyDIContainer = initializeSimplyDIContainer(
 	scopeName = scopeName,
 	simplyLogLevel = simplyLogLevel,

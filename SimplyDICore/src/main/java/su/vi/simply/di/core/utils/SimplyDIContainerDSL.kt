@@ -4,7 +4,7 @@ import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.error.SimplyDINotFoundException
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 
-public class SimplyDIContainerBuilder {
+public class SimplyDIContainerDSL {
 	public lateinit var scopeName: String
 	private var isSearchInScope: Boolean = true
 
@@ -19,7 +19,7 @@ public class SimplyDIContainerBuilder {
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
 		isSearchInScope: Boolean = true,
-		builder: SimplyDIContainerBuilder.() -> Unit,
+		context: SimplyDIContainerDSL.() -> Unit,
 	): SimplyDIContainer {
 		this.scopeName = scopeName
 		simplyDIContainer.initializeContainer(
@@ -27,7 +27,7 @@ public class SimplyDIContainerBuilder {
 			simplyLogLevel,
 			isSearchInScope
 		)
-		builder.invoke(this)
+		context.invoke(this)
 		return simplyDIContainer
 	}
 
@@ -88,14 +88,14 @@ public fun initializeSimplyDIContainer(
 	scopeName: String = DEFAULT_SCOPE_NAME,
 	simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
 	isSearchInScope: Boolean = true,
-	builder: SimplyDIContainerBuilder.() -> Unit,
+	builder: SimplyDIContainerDSL.() -> Unit,
 ): SimplyDIContainer {
-	val containerBuilder = SimplyDIContainerBuilder()
+	val containerBuilder = SimplyDIContainerDSL()
 
 	return containerBuilder.initialize(
 		scopeName = scopeName,
 		simplyLogLevel = simplyLogLevel,
 		isSearchInScope = isSearchInScope,
-		builder = builder
+		context = builder
 	)
 }
