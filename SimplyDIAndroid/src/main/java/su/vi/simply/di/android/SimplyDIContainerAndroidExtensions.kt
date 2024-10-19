@@ -9,6 +9,15 @@ import su.vi.simply.di.core.utils.SimplyDIContainerDSL
 import su.vi.simply.di.core.utils.SimplyLogLevel
 import su.vi.simply.di.core.utils.initializeSimplyDIContainer
 
+/**
+ * Initialize method for new container.
+ * @param scopeName name of the new container.
+ * @param simplyLogLevel where you can set level of logs for you needs for example for release
+ * would do use [SimplyLogLevel.EMPTY] for debug [SimplyLogLevel.FULL].
+ * @param isSearchInScope if you want to use this container like data store or you need
+ * to share dependencies from this container you would set value like true or you can bind them [SimplyDIContainerDSL.addChainScopes].
+ * @param builder context of [SimplyDIContainerDSL] where you can interact with [SimplyDIContainer] more convenient.
+ */
 public fun initializeSimplyDIAndroidContainer(
 	application: Application,
 	scopeName: String = DEFAULT_SCOPE_NAME,
