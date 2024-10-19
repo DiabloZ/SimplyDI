@@ -6,12 +6,12 @@ import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.simply.di.core.utils.getDependency
 
 /**
- * Делегат для ленивого получения зависимостей из [SimplyDIContainer] в любом месте, если она в нём есть.
+ * Delegate to get dependency by lazy from [SimplyDIContainer]. You can call it from any place.
+ * @param scopeName name of your scope with you declared before.
+ * @param mode lazy thread mode [LazyThreadSafetyMode], recommended use option by default.
+ * @param T instance of class.
  *
- * @param mode режим ленивого получения [LazyThreadSafetyMode], рекомендуется использовать мод по умолчанию.
- * @param T инстанс класса.
- *
- * @throws SimplyDINotFoundException если зависимость не будет найдена с добавлением в контейнер
+ * @throws SimplyDINotFoundException if dependency not initialized before with [scopeName]
  */
 @Throws(SimplyDINotFoundException::class)
 public inline fun <reified T : Any> inject(

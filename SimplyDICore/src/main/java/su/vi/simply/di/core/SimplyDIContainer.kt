@@ -20,6 +20,7 @@ import su.vi.simply.di.core.utils.SimplyDIConstants.SCOPE_IS_NOT_INITIALIZED
 import su.vi.simply.di.core.utils.SimplyDIConstants.TAG
 import su.vi.simply.di.core.utils.SimplyDIConstants.TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED
 import su.vi.simply.di.core.utils.SimplyLogLevel
+import su.vi.simply.di.core.utils.addChainScopes
 import su.vi.simply.di.core.utils.toSimplyDILogger
 import kotlin.concurrent.thread
 import kotlin.reflect.KClass
@@ -37,10 +38,11 @@ public class SimplyDIContainer(
 
 	/**
 	 * Initialize method for new container.
-	 * @param scopeName name of new container
-	 * @param simplyLogLevel - [SimplyLogLevel] where you can set level of logs for you needs for example for release
+	 * @param scopeName name of the new container.
+	 * @param simplyLogLevel where you can set level of logs for you needs for example for release
 	 * would do use [SimplyLogLevel.EMPTY] for debug [SimplyLogLevel.FULL].
-	 * @param isSearchInScope if you want to use this container like data store or you need to share dependencies from this container you would set value like true.
+	 * @param isSearchInScope if you want to use this container like data store or you need
+	 * to share dependencies from this container you would set value like true or you can bind them [SimplyDIContainer.addChainScopes] .
 	 */
 	@Deprecated(
 		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
