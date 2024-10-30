@@ -4,3 +4,6 @@
 
 **/build/
 *.txt
+*.gpg
+*.asc
+*.properties

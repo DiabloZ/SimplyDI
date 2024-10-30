@@ -18,6 +18,7 @@ minSDKVersionApp = "24"
 minSDKVersionSDK = "21"
 nameSpaceApp = "su.vi.simplydiapp"
 nameSpaceSDK = "su.vi.simplydi"
+vanniktechMavenPublish = "0.29.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,4 +43,4 @@ androidx-lifecycle-viewmodel-compose-android = { group = "androidx.lifecycle", n
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-
+vanniktechMavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktechMavenPublish" }
