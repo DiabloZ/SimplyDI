@@ -34,7 +34,8 @@ android {
 }
 
 dependencies {
-	implementation(project(":SimplyDICore"))
+/*	implementation(project(":SimplyDICore"))*/
+	implementation("io.github.diabloz:simply-di-core:1.0.1")
 
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.appcompat)
@@ -49,7 +50,7 @@ mavenPublishing {
 	coordinates(
 		groupId = "io.github.diabloz",
 		artifactId = "simply-di-viewmodel", //
-		version = "1.0.0"
+		version = "1.0.1"
 	)
 	pom {
 		name = "SimplyDIViewModel" //

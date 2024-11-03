@@ -10,7 +10,7 @@ android {
 	defaultConfig {
 		applicationId = libs.versions.nameSpaceApp.get()
 		minSdk = libs.versions.minSDKVersionApp.get().toInt()
-		targetSdk = libs.versions.targetSDK.get().toInt()
+		targetSdk = libs.versions.compileSDK.get().toInt()
 		versionCode = 1
 		versionName = "1.0"
 
@@ -51,7 +51,6 @@ kotlin {
 }
 
 dependencies {
-
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.lifecycle.runtime.ktx)
 	implementation(libs.androidx.activity.compose)
@@ -68,8 +67,12 @@ dependencies {
 	debugImplementation(libs.androidx.ui.tooling)
 	debugImplementation(libs.androidx.ui.test.manifest)
 
-	implementation(project(":SimplyDICore"))
+/*	implementation(project(":SimplyDICore"))
 	implementation(project(":SimplyDIAndroid"))
 	implementation(project(":SimplyDIViewModel"))
-	implementation(project(":SimplyDICompose"))
+	implementation(project(":SimplyDICompose"))*/
+	implementation("io.github.diabloz:simply-di-core:1.0.1")
+	implementation("io.github.diabloz:simply-di-android:1.0.1")
+	implementation("io.github.diabloz:simply-di-viewmodel:1.0.1")
+	implementation("io.github.diabloz:simply-di-compose:1.0.1")
 }
