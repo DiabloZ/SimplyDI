@@ -1,6 +1,7 @@
 plugins {
 	alias(libs.plugins.android.application)
 	alias(libs.plugins.jetbrains.kotlin.android)
+	id("com.google.devtools.ksp") version "1.7.20-1.0.8"
 }
 
 android {
@@ -44,12 +45,21 @@ android {
 			excludes += "/META-INF/{AL2.0,LGPL2.1}"
 		}
 	}
+	applicationVariants.all {
+		kotlin.sourceSets {
+			getByName(name) {
+				kotlin.srcDir("build/generated/ksp/${name}/kotlin")
+			}
+		}
+	}
 }
 
 kotlin {
 	explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
+	sourceSets.main {
+		kotlin.srcDir("build/generated/ksp/main/kotlin")
+	}
 }
-
 dependencies {
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -70,9 +80,12 @@ dependencies {
 /*	implementation(project(":SimplyDICore"))
 	implementation(project(":SimplyDIAndroid"))
 	implementation(project(":SimplyDIViewModel"))
+	implementation(project(":SimplyDIAnnotations"))
 	implementation(project(":SimplyDICompose"))*/
 	implementation("io.github.diabloz:simply-di-core:1.0.1")
 	implementation("io.github.diabloz:simply-di-android:1.0.1")
 	implementation("io.github.diabloz:simply-di-viewmodel:1.0.1")
 	implementation("io.github.diabloz:simply-di-compose:1.0.1")
+	implementation(project(":SimplyDIAnnotations"))
+	ksp(project(":SimplyDIProcessor", configuration = "default"))
 }
