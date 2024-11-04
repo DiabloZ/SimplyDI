@@ -56,10 +56,11 @@ android {
 
 kotlin {
 	explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
-	sourceSets.main {
-		kotlin.srcDir("build/generated/ksp/main/kotlin")
+	sourceSets.all {
+		kotlin.srcDir("build/generated/ksp/${name}/kotlin")
 	}
 }
+
 dependencies {
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.lifecycle.runtime.ktx)

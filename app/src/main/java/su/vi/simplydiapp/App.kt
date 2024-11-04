@@ -73,6 +73,8 @@ class App : Application() {
 				addChainScopes(listOfScopes = listOf("6", "12345", DEFAULT_SCOPE_NAME, "5"))
 			}
 
+				su.vi.simplydiapp.for_test.BububuGenerated().greet()
+
 			/*			val test = initializeSimplyDIContainer(
 							scopeName = "abc",
 							simplyLogLevel = SimplyLogLevel.FULL,
