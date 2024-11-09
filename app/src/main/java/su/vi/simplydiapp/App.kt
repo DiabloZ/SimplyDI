@@ -69,11 +69,14 @@ class App : Application() {
 			) {
 				addDependencyLater { Bububu() }
 				addDependencyLater { Bububu() }
+/*				addDependencyLater { Bububu2(
+					getFactoryDependency()
+				) }*/
 				replaceDependencyLater { Bububu() }
 				addChainScopes(listOfScopes = listOf("6", "12345", DEFAULT_SCOPE_NAME, "5"))
 			}
 
-				su.vi.simplydiapp.for_test.BububuGenerated().greet()
+				//su.vi.simplydiapp.for_test.BububuGenerated().greet()
 
 			/*			val test = initializeSimplyDIContainer(
 							scopeName = "abc",
