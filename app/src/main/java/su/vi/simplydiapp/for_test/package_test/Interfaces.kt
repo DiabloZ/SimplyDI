@@ -1,4 +1,4 @@
-package su.vi.simplydiapp.for_test
+package su.vi.simplydiapp.for_test.package_test
 
 
 internal interface TestInterface123

@@ -10,6 +10,9 @@ public class AutoGenerateProcessor(
 	private val logger: KSPLogger
 ) : SymbolProcessor {
 
+	private val mutableBindsMap: MutableMap<String, BindModel> = mutableMapOf()
+	private val mutableScopeList: MutableMap<String, ScopeModel> = mutableMapOf()
+
 	override fun process(resolver: Resolver): List<KSAnnotated> {
 		loggerr = logger
 		println("1!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -20,12 +23,21 @@ public class AutoGenerateProcessor(
 				logger.warn("definition(class) -> $element", element)
 				logger.warn("!!!!!!!!!!!!!!!!!!!!!!!!!")
 				val ksClassDeclaration = (element as? KSClassDeclaration) ?: return@forEach
-				val packageName = (ksClassDeclaration.containingFile?.packageName ?: return@forEach).toString()
+
+				val packageName = ksClassDeclaration.packageName.asString()
 				val className = ksClassDeclaration.simpleName.asString()
 				val qualifier =  ksClassDeclaration.getStringQualifier()
-				val annotations = element.getKoinAnnotations()
+				val annotations = element.getAnnotations()
 				annotations.firstNotNullOfOrNull { (annotationName, annotation) ->
-					createClassDefinition(element, annotation, ksClassDeclaration, annotationName, packageName, qualifier, className, annotations)
+					createClassDefinition(
+						annotation = annotation,
+						ksClassDeclaration = ksClassDeclaration,
+						annotationName = annotationName,
+						packageName = packageName,
+						qualifier = qualifier,
+						className = className,
+						annotations = annotations
+					)
 				}
 
 			}
@@ -37,12 +49,13 @@ public class AutoGenerateProcessor(
 		}*/
 
 
-
+		mutableScopeList.forEach {
+			logger.warn("FIN - $it")
+		}
 		return emptyList()
 	}
 
 	private fun createClassDefinition(
-		element: KSClassDeclaration,
 		annotation: KSAnnotation,
 		ksClassDeclaration: KSClassDeclaration,
 		annotationName: String,
@@ -52,41 +65,82 @@ public class AutoGenerateProcessor(
 		annotations: Map<String, KSAnnotation>,
 	): Unit? {
 
-		val declaredBindings = declaredBindings(annotation)
+
 		val defaultBindings = ksClassDeclaration.superTypes.map { it.resolve().declaration }.toList()
 		logger.warn("????????????????????")
-		logger.warn("$declaredBindings")
+		logger.warn("$packageName")
+		logger.warn("$className")
 		logger.warn("$defaultBindings")
 
-		val allBindings: Map<String, BindModel> =
-			(if (declaredBindings?.isNotEmpty() == true) declaredBindings else defaultBindings)
-				.associate {
-					it.simpleName.asString() to BindModel(
-						packageName = it.packageName.asString(),
-						simpleName = it.simpleName.asString()
-					)
-				}
+		val allBindings: Map<String, BindModel> = defaultBindings.associate {
+			it.simpleName.asString() + it.packageName.asString() to BindModel(
+				packageName = it.packageName.asString(),
+				simpleName = it.simpleName.asString()
+			)
+		}
+		mutableBindsMap.putAll(allBindings)
 
 		logger.warn("allBindings MAP- $allBindings")
 		allBindings.forEach {
 			logger.warn("allBindings - $it")
 		}
-		val ctorParams = ksClassDeclaration.primaryConstructor?.parameters?.getConstructorParameters()
-		val ctorParamsSize = ctorParams?.size ?: 0
-		ctorParams?.forEach {
+
+		var ctorParams = ksClassDeclaration.primaryConstructor?.parameters?.getConstructorParameters() ?: listOf()
+		//logger.warn("typeParameters - ${ksClassDeclaration.getAllProperties()}")
+		ksClassDeclaration.getAllProperties().forEach {
+			logger.warn("typeParameters - ${it.packageName}")
+			logger.warn("typeParameters - ${it.simpleName}")
+		}
+
+		val ctorParamsSize = ctorParams.size
+		ctorParams = ctorParams.map {
+			if (mutableBindsMap.containsKey(it.packageName+it.simpleName) ) {
+				it.copy(packageName = mutableBindsMap[it.packageName+it.simpleName]?.packageName)
+			} else {
+				it
+			}
+		}
+		ctorParams.forEach {
 			logger.warn("ctorParams - $it")
 		}
 
-		logger.warn("????????????????????")
-		val scopeName: String = annotation.arguments.firstOrNull { it.name?.asString() == "scopeName" }?.value as String? ?: "!@#"
-		val scopeNames: Array<String> = annotation.arguments.firstOrNull { it.name?.asString() == "scopeNames" }?.value as? Array<String> ?: emptyArray()
+
+
+		//DEPENDENCY
 		val isCreateOnStart: Boolean = annotation.arguments.firstOrNull { it.name?.asString() == "isCreateOnStart" }?.value as? Boolean ?: false
+		val dependency = DependencyModel(
+			packageName = packageName,
+			simpleName = className,
+			isCreateOnStart = isCreateOnStart,
+			properties = ctorParams,
+			binds = allBindings.values.toList(),
+		)
+
+		//SCOPE
+		val scopeName: String = annotation.arguments.firstOrNull { it.name?.asString() == "scopeName" }?.value as String? ?: ""
+		var scopeNames: List<String> = annotation.arguments.firstOrNull { it.name?.asString() == "scopeNames" }?.value.toString().replace("[","").replace("]","").split(",")
+		logger.warn("scopeNamesscopeNames - ${annotation.arguments.firstOrNull { it.name?.asString() == "scopeNames" }?.value.toString()}")
 		val isSearchInScope: Boolean = annotation.arguments.firstOrNull { it.name?.asString() == "isSearchInScope" }?.value as? Boolean ?: false
-		val chainWith: Array<String> = annotation.arguments.firstOrNull { it.name?.asString() == "chainWith" }?.value as? Array<String> ?: emptyArray()
+		val isFullLogger: Boolean = annotation.arguments.firstOrNull { it.name?.asString() == "isFullLogger" }?.value as? Boolean ?: false
+		val chainWith: List<String> = annotation.arguments.firstOrNull { it.name?.asString() == "chainWith" }?.value.toString().replace("[","").replace("]","").split(",")
 
-		val packageName = ksClassDeclaration.packageName.asString()
-		val className = ksClassDeclaration.simpleName.asString()
 
+		scopeNames = scopeNames.plus(scopeName)
+
+		scopeNames.forEach { name ->
+			if (name != "") {
+				logger.warn("addScope - $name")
+				addScope(
+					ScopeModel(
+						scopeName = name,
+						isSearchInScope = isSearchInScope,
+						isFullLogger = isFullLogger,
+						chainedWith = chainWith.toList(),
+						mutableDependencyList = listOf(dependency)
+					)
+				)
+			}
+		}
 
 
 
@@ -135,6 +189,15 @@ public class AutoGenerateProcessor(
 		return null
 	}
 
+	@Synchronized
+	private fun addScope(scopeModel: ScopeModel) {
+		val existsScope = mutableScopeList[scopeModel.scopeName]
+		mutableScopeList[scopeModel.scopeName] = existsScope?.copy(
+			chainedWith = (existsScope.chainedWith + scopeModel.chainedWith).distinct(),
+			mutableDependencyList = (existsScope.mutableDependencyList + scopeModel.mutableDependencyList).distinct()
+		) ?: scopeModel
+	}
+
 	private fun generateCodeForClass(classDeclaration: KSClassDeclaration) {
 
 		val packageName = classDeclaration.packageName.asString()
@@ -168,29 +231,27 @@ internal fun List<KSValueArgument>.getValueArgument(): String? {
 	return firstOrNull { a -> a.name?.asString() == "value" }?.value as? String?
 }
 
-internal fun KSAnnotated.getKoinAnnotations(): Map<String, KSAnnotation> {
+internal fun KSAnnotated.getAnnotations(): Map<String, KSAnnotation> {
 	return annotations
 		.filter { it.shortName.asString().lowercase(Locale.getDefault()) ==  Dependency::class.simpleName?.lowercase(Locale.getDefault()).toString()}
 		.map { annotation -> Pair(annotation.shortName.asString(), annotation) }
 		.toMap()
 }
 
-internal fun declaredBindings(annotation: KSAnnotation): List<KSDeclaration>? {
-	val declaredBindingsTypes = annotation.arguments.firstOrNull { it.name?.asString() == "binds" }?.value as? List<KSType>?
-	return declaredBindingsTypes?.map { it.declaration }
-}
-
 internal fun List<KSValueParameter>.getConstructorParameters(): List<PropertyModel> {
-	return map { param -> getConstructorParameter(param) }
+	return mapNotNull { param -> getConstructorParameter(param) }
 }
 
-private fun getConstructorParameter(param: KSValueParameter): PropertyModel {
+private fun getConstructorParameter(param: KSValueParameter): PropertyModel? {
 	val firstAnnotation = param.annotations.firstOrNull()
+
 	val annotationName = firstAnnotation?.shortName?.asString()
 	val annotationValue = firstAnnotation?.arguments?.getValueArgument()
 	val fileExt = param.location as? FileLocation
 	val asdasd = fileExt?.filePath?.substringBeforeLast(".")?.substringAfter("main/java/")?.replace("/", ".")
 	loggerr?.warn("!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	loggerr?.warn("firstAnnotation - ${firstAnnotation}")
+	loggerr?.warn("annotationName - ${annotationName}")
 	loggerr?.warn("annotationValue - ${annotationValue}")
 	loggerr?.warn("name - ${param.name?.getShortName()}")
 	loggerr?.warn("name.asString - ${param.name?.asString()}")
@@ -227,20 +288,39 @@ private fun getConstructorParameter(param: KSValueParameter): PropertyModel {
 
 	val type = param.type.toString() //for findDependencies
 	loggerr?.warn("TYPE - ${type}")
-	val shortName = param.name?.getShortName()
+	val shortName = param.name?.getShortName() ?: return null
 	val isNullable = param.type.resolve().isMarkedNullable
 	return PropertyModel(parameterName = shortName, isNullable = isNullable, simpleName = type)
 }
 
+
+
 internal data class PropertyModel(
-	var packageName: String? = null,
-	var simpleName: String? = null,
-	var parameterName: String? = null,
-	var isNullable: Boolean? = null,
+	val packageName: String? = null,
+	val simpleName: String,
+	val parameterName: String,
+	val isNullable: Boolean,
 ) {
-	fun isFull() = parameterName != null && simpleName != null && packageName != null && isNullable != null
+	fun isHavePackage() = packageName != null
 }
+
 internal data class BindModel(
 	var packageName: String,
 	var simpleName: String,
+)
+
+internal data class ScopeModel(
+	val scopeName: String,
+	val isSearchInScope: Boolean,
+	val isFullLogger: Boolean,
+	val chainedWith: List<String>,
+	val mutableDependencyList: List<DependencyModel>
+)
+
+internal data class DependencyModel(
+	val packageName: String,
+	val simpleName: String,
+	val isCreateOnStart: Boolean,
+	val properties: List<PropertyModel> = emptyList(),
+	val binds: List<BindModel> = emptyList()
 )
