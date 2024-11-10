@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import su.vi.simply.di.android.simplyAndroidViewModel
 import su.vi.simply.di.compose.simplyComposeViewModel
 import su.vi.simply.di.core.delegates.inject
-import su.vi.simplydiapp.for_test.Bububu
+import su.vi.simplydiapp.for_test.bu.Bububu
 import su.vi.simplydiapp.ui.theme.SimplyDITheme
 
 class MainActivity : ComponentActivity() {

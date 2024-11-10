@@ -7,5 +7,6 @@ annotation class Dependency(
 	val scopeNames: Array<String> = [],
 	val isCreateOnStart: Boolean = false,
 	val isSearchInScope: Boolean = false,
+	val isFullLogger: Boolean = false,
 	val chainWith: Array<String> = []
 )

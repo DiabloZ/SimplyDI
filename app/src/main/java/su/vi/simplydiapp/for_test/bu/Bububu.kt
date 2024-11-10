@@ -1,4 +1,4 @@
-package su.vi.simplydiapp.for_test
+package su.vi.simplydiapp.for_test.bu
 
 import androidx.lifecycle.ViewModel
 import su.vi.simply.di.annotations.Dependency

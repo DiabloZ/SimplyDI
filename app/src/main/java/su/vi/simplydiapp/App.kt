@@ -6,7 +6,7 @@ import su.vi.simply.di.android.initializeSimplyDIAndroidContainer
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.simply.di.core.utils.SimplyLogLevel
 import su.vi.simply.di.core.utils.initializeSimplyDIContainer
-import su.vi.simplydiapp.for_test.Bububu
+import su.vi.simplydiapp.for_test.bu.Bububu
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
