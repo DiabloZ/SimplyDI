@@ -5,6 +5,8 @@ import com.google.devtools.ksp.symbol.*
 import su.vi.simply.di.annotations.Dependency
 import java.util.Locale
 
+private var loggerr: KSPLogger? = null
+
 public class AutoGenerateProcessor(
 	private val codeGenerator: CodeGenerator,
 	private val logger: KSPLogger
@@ -13,9 +15,10 @@ public class AutoGenerateProcessor(
 	private val mutableBindsMap: MutableMap<String, BindModel> = mutableMapOf()
 	private val mutableScopeList: MutableMap<String, ScopeModel> = mutableMapOf()
 
+
 	override fun process(resolver: Resolver): List<KSAnnotated> {
 		loggerr = logger
-		println("1!!!!!!!!!!!!!!!!!!!!!!!!!")
+
 		logger.warn("start process !!!")
 		resolver.getSymbolsWithAnnotation(Dependency::class.qualifiedName ?: return emptyList())
 			.filterIsInstance<KSClassDeclaration>()
@@ -42,13 +45,9 @@ public class AutoGenerateProcessor(
 
 			}
 
-/*		val symbols = resolver.getSymbolsWithAnnotation(Dependency::class.qualifiedName!!)
-		symbols.filterIsInstance<KSClassDeclaration>().forEach { classDeclaration ->
-			println("2!!!!!!!!!!!!!!!!!!!!!!!!!")
-			//generateCodeForClass(classDeclaration)
-		}*/
-
-
+		mutableBindsMap.forEach {
+			logger.warn("BIND - $it")
+		}
 		mutableScopeList.forEach {
 			logger.warn("FIN - $it")
 		}
@@ -164,26 +163,14 @@ public class AutoGenerateProcessor(
 				writer.write("            $packageName.$className()\n")
 			} else {
 				writer.write("            $packageName.$className(\n")
-				repeat(ctorParamsSize) {
-					writer.write("                getDependency(),\n")
+				ctorParams.forEach { propertyModel ->
+					writer.write(propertyModel.toString())
 				}
 				writer.write("            )\n")
-
 			}
 			writer.write("        }\n")
 			writer.write("        \n")
 			writer.write("    }\n")
-			writer.write("    //annotationName - $annotationName\n")
-			writer.write("    //packageName - $packageName\n")
-			writer.write("    //qualifier - $qualifier\n")
-			writer.write("    //className - $className\n")
-			writer.write("    //annotations - $annotations\n")
-			writer.write("    //scopeName - $scopeName\n")
-			writer.write("    //isCreateOnStart - $isCreateOnStart\n")
-			writer.write("    //allBindings - $allBindings\n")
-			writer.write("    //chainWith - ${chainWith.toList()}\n")
-			writer.write("    //scopeNames - ${scopeNames.toList()}\n")
-			writer.write("    //ctorParams - ${ctorParams}\n")
 			writer.write("}\n")
 		}
 		return null
@@ -197,31 +184,8 @@ public class AutoGenerateProcessor(
 			mutableDependencyList = (existsScope.mutableDependencyList + scopeModel.mutableDependencyList).distinct()
 		) ?: scopeModel
 	}
-
-	private fun generateCodeForClass(classDeclaration: KSClassDeclaration) {
-
-		val packageName = classDeclaration.packageName.asString()
-		val className = classDeclaration.simpleName.asString()
-		val fileName = "${className}Generated"
-
-		val file = codeGenerator.createNewFile(
-			Dependencies(false, classDeclaration.containingFile ?: return),
-			packageName,
-			fileName
-		)
-
-		file.writer().use { writer ->
-			writer.write("package $packageName\n\n")
-			writer.write("class $fileName {\n")
-			writer.write("    fun greet() = println(\"!Hello from $fileName!\")\n")
-			writer.write("}\n")
-		}
-	}
-
-
 }
 
-public var loggerr: KSPLogger? = null
 internal fun KSAnnotated.getStringQualifier(): String? {
 	val qualifierAnnotation = annotations.firstOrNull { a -> a.shortName.asString() == "Named" } ?: return null
 	return qualifierAnnotation.arguments.getValueArgument() ?: error("Can't get value for @Named")
@@ -302,6 +266,10 @@ internal data class PropertyModel(
 	val isNullable: Boolean,
 ) {
 	fun isHavePackage() = packageName != null
+
+	override fun toString(): String {
+		return "                $parameterName = getDependency(),\n"
+	}
 }
 
 internal data class BindModel(
@@ -315,7 +283,11 @@ internal data class ScopeModel(
 	val isFullLogger: Boolean,
 	val chainedWith: List<String>,
 	val mutableDependencyList: List<DependencyModel>
-)
+) {
+	override fun toString(): String {
+		return ""
+	}
+}
 
 internal data class DependencyModel(
 	val packageName: String,

@@ -7,6 +7,7 @@ import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.simply.di.core.utils.SimplyLogLevel
 import su.vi.simply.di.core.utils.initializeSimplyDIContainer
 import su.vi.simplydiapp.for_test.bu.Bububu
+import su.vi.simplydiapp.for_test.mu.Mumumu2Generated
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -88,7 +89,7 @@ class App : Application() {
 						}
 						Log.e(TAG, test.toString())*/
 		}.inWholeMilliseconds
-
+		Mumumu2Generated().initDependencies()
 		Log.e(TAG, "INITED FOR - $time ms")
 	}
 
