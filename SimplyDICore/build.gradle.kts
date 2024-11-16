@@ -45,7 +45,7 @@ mavenPublishing {
 	coordinates(
 		groupId = "io.github.diabloz",
 		artifactId = "simply-di-core", //
-		version = "1.0.1"
+		version = libs.versions.commonVersion.get()
 	)
 	pom {
 		name = "SimplyDICore" //
@@ -79,3 +79,10 @@ mavenPublishing {
 		signAllPublications()
 	}
 }
+
+/*configurePublishing(
+	artifactId = "simply-di-core",
+	projectName = "SimplyDICore",
+	projectDescription = "The simplest and lightest library for DI",
+	projectVersion = "1.0.1"
+)*/

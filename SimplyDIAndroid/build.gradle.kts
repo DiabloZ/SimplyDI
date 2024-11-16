@@ -34,14 +34,10 @@ android {
 }
 
 dependencies {
-/*	implementation(project(":SimplyDICore"))
-	implementation(project(":SimplyDIViewModel"))*/
-	implementation("io.github.diabloz:simply-di-core:1.0.1")
-	implementation("io.github.diabloz:simply-di-viewmodel:1.0.1")
-
-	implementation(libs.androidx.core.ktx)
+	api(project(":SimplyDICore"))
+	api(project(":SimplyDIViewModel"))
 	implementation(libs.androidx.appcompat)
-	implementation(libs.material)
+
 	testImplementation(libs.junit)
 	androidTestImplementation(libs.androidx.junit)
 	androidTestImplementation(libs.androidx.espresso.core)
@@ -51,7 +47,7 @@ mavenPublishing {
 	coordinates(
 		groupId = "io.github.diabloz",
 		artifactId = "simply-di-android", //
-		version = "1.0.1"
+		version = libs.versions.commonVersion.get()
 	)
 	pom {
 		name = "SimplyDIAndroid" //
@@ -85,3 +81,11 @@ mavenPublishing {
 		signAllPublications()
 	}
 }
+
+/*
+configurePublishing(
+	artifactId = "simply-di-android",
+	projectName = "SimplyDIAndroid",
+	projectDescription = "The simplest and lightest library for DI",
+	projectVersion = "1.0.1"
+)*/

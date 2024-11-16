@@ -51,14 +51,13 @@ kotlin {
 }
 
 dependencies {
-	implementation(libs.androidx.core.ktx)
-	implementation(libs.androidx.lifecycle.runtime.ktx)
 	implementation(libs.androidx.activity.compose)
 	implementation(platform(libs.androidx.compose.bom))
 	implementation(libs.androidx.ui)
 	implementation(libs.androidx.ui.graphics)
 	implementation(libs.androidx.ui.tooling.preview)
 	implementation(libs.androidx.material3)
+
 	testImplementation(libs.junit)
 	androidTestImplementation(libs.androidx.junit)
 	androidTestImplementation(libs.androidx.espresso.core)
@@ -71,8 +70,8 @@ dependencies {
 	implementation(project(":SimplyDIAndroid"))
 	implementation(project(":SimplyDIViewModel"))
 	implementation(project(":SimplyDICompose"))*/
-	implementation("io.github.diabloz:simply-di-core:1.0.1")
-	implementation("io.github.diabloz:simply-di-android:1.0.1")
-	implementation("io.github.diabloz:simply-di-viewmodel:1.0.1")
-	implementation("io.github.diabloz:simply-di-compose:1.0.1")
+	implementation("io.github.diabloz:simply-di-core:1.0.2")
+	implementation("io.github.diabloz:simply-di-android:1.0.2")
+	implementation("io.github.diabloz:simply-di-viewmodel:1.0.2")
+	implementation("io.github.diabloz:simply-di-compose:1.0.2")
 }

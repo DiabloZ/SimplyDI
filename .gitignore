@@ -2,6 +2,7 @@
 /.git/
 /.idea/
 
+**/.gradle/
 **/build/
 *.txt
 *.gpg
