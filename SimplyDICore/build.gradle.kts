@@ -1,47 +1,25 @@
 import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
-	alias(libs.plugins.android.library)
-	alias(libs.plugins.jetbrains.kotlin.android)
-	alias(libs.plugins.vanniktechMavenPublish)
+	alias(libs.plugins.kotlin.jvm)
+	//alias(libs.plugins.vanniktechMavenPublish)
 }
 
-android {
-	namespace = libs.versions.nameSpaceSDK.get()
-	compileSdk = libs.versions.compileSDK.get().toInt()
+repositories {
+	mavenCentral()
+}
 
-	defaultConfig {
-		minSdk = libs.versions.minSDKVersionSDK.get().toInt()
-
-		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-		consumerProguardFiles("consumer-rules.pro")
-	}
-
-	buildTypes {
-		release {
-			isMinifyEnabled = false
-			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-		}
-	}
-	compileOptions {
-		sourceCompatibility = JavaVersion.VERSION_1_8
-		targetCompatibility = JavaVersion.VERSION_1_8
-	}
-
-	kotlinOptions {
-		jvmTarget = JavaVersion.VERSION_1_8.toString()
-		freeCompilerArgs += "-Xexplicit-api=strict"
-	}
-
+kotlin {
+	explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
 }
 
 dependencies {
-	testImplementation(libs.junit)
-	androidTestImplementation(libs.androidx.junit)
-	androidTestImplementation(libs.androidx.espresso.core)
+/*	testImplementation(libs.junit)
+	testImplementation(libs.androidx.junit)
+	testImplementation(libs.androidx.espresso.core)*/
 }
 
-mavenPublishing {
+/*mavenPublishing {
 	coordinates(
 		groupId = "io.github.diabloz",
 		artifactId = "simply-di-core", //
@@ -78,7 +56,7 @@ mavenPublishing {
 
 		signAllPublications()
 	}
-}
+}*/
 
 /*configurePublishing(
 	artifactId = "simply-di-core",

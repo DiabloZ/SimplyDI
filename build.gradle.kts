@@ -3,6 +3,9 @@ plugins {
 	alias(libs.plugins.jetbrains.kotlin.android) apply false
 	alias(libs.plugins.android.library) apply false
 	alias(libs.plugins.vanniktechMavenPublish) apply false
+	alias(libs.plugins.jetbrains.kotlin.jvm) apply false
+	alias(libs.plugins.kotlinMultiplatform).apply(false)
+	id("com.google.devtools.ksp") version "1.7.20-1.0.8" apply false
 }
 
 allprojects {

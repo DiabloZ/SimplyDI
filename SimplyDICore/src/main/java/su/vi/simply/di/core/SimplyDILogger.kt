@@ -1,6 +1,5 @@
 package su.vi.simply.di.core
 
-import android.util.Log
 import su.vi.simply.di.core.utils.SimplyLogLevel
 
 /**
@@ -18,13 +17,13 @@ internal abstract class SimplyDILogger {
  */
 internal class SimplyDILoggerFull: SimplyDILogger() {
 	override fun d(tag: String, text: String, throwable: Throwable?) {
-		Log.d(tag, text, throwable)
+		println("DEBUG TAG - $tag, TEXT - $text, TR - $throwable")
 	}
 	override fun e(tag: String, text: String, throwable: Throwable?) {
-		Log.e(tag, text, throwable)
+		println("ERROR TAG - $tag, TEXT - $text, TR - $throwable")
 	}
 	override fun wtf(tag: String, text: String, throwable: Throwable?) {
-		Log.wtf(tag, text, throwable)
+		println("WTF TAG - $tag, TEXT - $text, TR - $throwable")
 	}
 }
 
