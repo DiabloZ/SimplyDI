@@ -70,8 +70,8 @@ dependencies {
 	implementation(project(":SimplyDIAndroid"))
 	implementation(project(":SimplyDIViewModel"))
 	implementation(project(":SimplyDICompose"))*/
-	implementation("io.github.diabloz:simply-di-core:1.0.2")
-	implementation("io.github.diabloz:simply-di-android:1.0.2")
-	implementation("io.github.diabloz:simply-di-viewmodel:1.0.2")
-	implementation("io.github.diabloz:simply-di-compose:1.0.2")
+	implementation("io.github.diabloz:simply-di-core:1.0.3")
+	implementation("io.github.diabloz:simply-di-android:1.0.3")
+	implementation("io.github.diabloz:simply-di-viewmodel:1.0.3")
+	implementation("io.github.diabloz:simply-di-compose:1.0.3")
 }
