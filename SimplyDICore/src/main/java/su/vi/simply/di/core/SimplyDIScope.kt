@@ -16,7 +16,7 @@ internal class SimplyDIScope(
 
 	private val initializerFactory: MutableMap<Any, () -> Any> = mutableMapOf()
 
-	private val listOfDependencies: MutableSet<Any> = mutableSetOf()
+	private val listOfDependencies: MutableMap<Any, Any> = mutableMapOf()
 
 	/**
 	 * Use it to get dependencies with store it in list of dependencies.
@@ -26,10 +26,11 @@ internal class SimplyDIScope(
 	 **/
 	@Suppress("UNCHECKED_CAST")
 	internal fun <T: Any> getNullableDependency(clazz: KClass<*>): T? {
-		val dependency = listOfDependencies.find { dependency -> dependency::class == clazz } ?: run {
+		val dependency = listOfDependencies[clazz] ?: run {
 			val newInstance = initializerFactory[clazz]?.invoke()
 				?: return null
-			listOfDependencies.add(newInstance)
+			listOfDependencies[clazz] = newInstance
+			listOfDependencies[newInstance] = newInstance
 			newInstance
 		}
 		return (dependency as? T)
@@ -106,9 +107,7 @@ internal class SimplyDIScope(
 		factory: () -> T
 	) {
 		initializerFactory[clazz] = factory
-		listOfDependencies.add(
-			factory.invoke()
-		)
+		listOfDependencies[clazz] = factory.invoke()
 	}
 
 	/**

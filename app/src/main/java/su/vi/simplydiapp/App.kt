@@ -186,9 +186,58 @@ class App : Application() {
 		}
 
 		Log.e(TAG, "INITED FOR - $time")
+		container = initializeSimplyDIContainer(CONTAINER_NAME1) {
+			addChainScopes(listOfScopes = listOf(CONTAINER_NAME1, CONTAINER_NAME2))
+		}
 	}
 
 	companion object {
 		private const val TAG = "SIMPLY DI CONTAINER"
+		internal lateinit var container: SimplyDIContainer
+		internal lateinit var container2: SimplyDIContainer
+	}
+}
+
+private val CONTAINER_NAME1 = "testSomeContainer1"
+private val CONTAINER_NAME2 = "testSomeContainer2"
+
+public interface SomeStorage {
+	fun getSecretString(): String
+	fun setOtherString(other: String)
+	fun getOtherString(): String
+}
+
+internal class SomeStorageImpl(
+	private val secretString: String,
+) : SomeStorage {
+
+	override fun getSecretString(): String = secretString
+
+	private var _otherString = ""
+	override fun setOtherString(other: String) {
+		_otherString = other
+	}
+
+	override fun getOtherString(): String {
+		println("THIS !!!!!!!!!!!!!! - $this")
+		return _otherString
+	}
+}
+
+object SomePublicClassFromOtherModule {
+	lateinit var container: SimplyDIContainer
+
+	fun init(){
+		container = initializeSimplyDIContainer(CONTAINER_NAME2) {
+			addDependencyLater<SomeStorage> {
+				SomeStorageImpl("secret_shhhhhh...")
+			}
+			addChainScopes(listOfScopes = listOf(CONTAINER_NAME1, CONTAINER_NAME2))
+		}
+	}
+
+	fun getOther() :String {
+		val so = container.getDependency<SomeStorage>().getOtherString()
+		return so
 	}
 }

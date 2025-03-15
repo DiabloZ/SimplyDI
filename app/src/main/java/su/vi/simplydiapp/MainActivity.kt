@@ -15,39 +15,63 @@ import androidx.compose.ui.tooling.preview.Preview
 import su.vi.simply.di.android.simplyAndroidViewModel
 import su.vi.simply.di.compose.simplyComposeViewModel
 import su.vi.simply.di.core.delegates.inject
+import su.vi.simply.di.core.utils.getDependency
 import su.vi.simplydiapp.for_test.AnyClass
 import su.vi.simplydiapp.ui.theme.SimplyDITheme
 
 class MainActivity : ComponentActivity() {
-	private val asdas by simplyAndroidViewModel<AnyClass>(key = "1")
+	private val asdas by simplyAndroidViewModel<AnyClass>(key = "123")
 	private val asdass by inject<AnyClass>(scopeName = "1")
 
 	override fun onCreate(savedInstanceState: Bundle?) {
+
+
+		SomePublicClassFromOtherModule.init()
+		SomePublicClassFromOtherModule.getOther()
+
+		val someStorage = App.container.getDependency<SomeStorage>()
+		val someStorage2 = App.container.getDependency<SomeStorage>()
+		val someStorage3 = App.container.getDependency<SomeStorage>()
+		val someStorage4 = SomePublicClassFromOtherModule.container.getDependency<SomeStorage>()
+		val someStorage5 = SomePublicClassFromOtherModule.container.getDependency<SomeStorage>()
+		val someStorage6 = SomePublicClassFromOtherModule.container.getDependency<SomeStorage>()
+		println("??????????????" + someStorage)
+		println("??????????????" + someStorage2)
+		println("??????????????" + someStorage3)
+		println("??????????????" + someStorage4)
+		println("??????????????" + someStorage5)
+		println("??????????????" + someStorage6)
+
+
+
 		Log.d("SIMPLY DI CONTAINER", asdas.hashCode().toString())
 		Log.d("SIMPLY DI CONTAINER", asdass.hashCode().toString())
 
 		Log.d("SIMPLY DI CONTAINER", "!!!!!!!!!!!!!!")
-		val a1 = simplyAndroidViewModel<AnyClass>()
+		val a1 by simplyAndroidViewModel<AnyClass>()
 		Log.d("SIMPLY DI CONTAINER", a1.hashCode().toString())
-		val a2 = simplyAndroidViewModel<AnyClass>()
+		val a2 by simplyAndroidViewModel<AnyClass>()
 		Log.d("SIMPLY DI CONTAINER", a2.hashCode().toString())
-		val a3 = simplyAndroidViewModel<AnyClass>(key = "312")
+		val a3 by simplyAndroidViewModel<AnyClass>(key = "312")
 		Log.d("SIMPLY DI CONTAINER", a3.hashCode().toString())
-		val a4 = simplyAndroidViewModel<AnyClass>(key = "312")
+		val a4 by simplyAndroidViewModel<AnyClass>(key = "312")
 		Log.d("SIMPLY DI CONTAINER", a4.hashCode().toString())
-		val a5 = simplyAndroidViewModel<AnyClass>(key = "312")
+		val a5 by simplyAndroidViewModel<AnyClass>(key = "312")
 		Log.d("SIMPLY DI CONTAINER", a5.hashCode().toString())
-		val a6 = simplyAndroidViewModel<AnyClass>(key = "312")
+		val a6 by simplyAndroidViewModel<AnyClass>(key = "312")
 		Log.d("SIMPLY DI CONTAINER", a6.hashCode().toString())
-		val a7 = simplyAndroidViewModel<AnyClass>()
+		val a7 by simplyAndroidViewModel<AnyClass>()
 		Log.d("SIMPLY DI CONTAINER", a7.hashCode().toString())
-		val a8 = simplyAndroidViewModel<AnyClass>()
+		val a8 by simplyAndroidViewModel<AnyClass>()
 		Log.d("SIMPLY DI CONTAINER", a8.hashCode().toString())
-		val a9 = simplyAndroidViewModel<AnyClass>(key = "312")
+		val a9 by simplyAndroidViewModel<AnyClass>(key = "312")
 		Log.d("SIMPLY DI CONTAINER", a9.hashCode().toString())
-		val a10 = simplyAndroidViewModel<AnyClass>("")
+		val a10 by simplyAndroidViewModel<AnyClass>("")
 		Log.d("SIMPLY DI CONTAINER", a10.hashCode().toString())
+		val a11 by simplyAndroidViewModel<AnyClass>(key = "123")
+		Log.d("SIMPLY DI CONTAINER", a11.hashCode().toString())
 		Log.d("SIMPLY DI CONTAINER", "!!!!!!!!!!!!!!")
+
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
 		setContent {

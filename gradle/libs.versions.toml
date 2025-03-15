@@ -19,7 +19,7 @@ minSDKVersionSDK = "21"
 nameSpaceApp = "su.vi.simplydiapp"
 nameSpaceSDK = "su.vi.simplydi"
 vanniktechMavenPublish = "0.30.0"
-commonVersion = "1.0.4"
+commonVersion = "1.0.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,6 +38,10 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-lifecycle-viewmodel-compose-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose-android", version.ref = "lifecycleViewmodelComposeAndroid" }
+simply-di-android = { module = "io.github.diabloz:simply-di-android", version.ref = "commonVersion" }
+simply-di-compose = { module = "io.github.diabloz:simply-di-compose", version.ref = "commonVersion" }
+simply-di-core = { module = "io.github.diabloz:simply-di-core", version.ref = "commonVersion" }
+simply-di-viewmodel = { module = "io.github.diabloz:simply-di-viewmodel", version.ref = "commonVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
