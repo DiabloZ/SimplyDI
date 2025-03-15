@@ -1,6 +1,7 @@
 package su.vi.simply.di.core
 
 import su.vi.simply.di.core.error.SimplyDINotFoundException
+import su.vi.simply.di.core.lazy.SimplyDILazyWrapper
 import su.vi.simply.di.core.utils.SimplyDIConstants.CREATE_DEP_IMMEDIATELY
 import su.vi.simply.di.core.utils.SimplyDIConstants.CREATE_DEP_LAZY
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
@@ -73,6 +74,11 @@ public class SimplyDIContainer(
 		logger.d(TAG, String.format(LOG_INIT, scopeName))
 	}
 
+	/**
+	 * Method for getting a dependency from [SimplyDIScope] immediately.
+	 * @return T
+	 * @throws SimplyDINotFoundException if dependency is not found
+	 **/
 	@Deprecated(
 		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
 		replaceWith = ReplaceWith(
@@ -103,9 +109,9 @@ public class SimplyDIContainer(
 	}
 
 	/**
-	 * Метод для получения зависимости из [SimplyDIScope].
+	 * Method for getting a dependency from [SimplyDIScope].
 	 * @return T
-	 * @throws SimplyDINotFoundException если зависимость не будет найдена
+	 * @throws SimplyDINotFoundException if dependency is not found
 	 **/
 	@Deprecated(
 		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
@@ -173,7 +179,7 @@ public class SimplyDIContainer(
 	}
 
 	/**
-	 * Метод для удаления зависимости из [SimplyDIScope] инициализированных и конструктор для инициализации.
+	 * Method for removing dependencies from initialized [SimplyDIScope] and a constructor for initialization.
 	 **/
 	@Deprecated(
 		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
@@ -196,9 +202,9 @@ public class SimplyDIContainer(
 	}
 
 	/**
-	 * Метод для получения зависимости из [SimplyDIScope].
+	 * A method for getting a dependency from [SimplyDIScope].
 	 * @return T
-	 * @throws SimplyDINotFoundException если зависимость не будет найдена с добавлением в контейнер
+	 * @throws SimplyDINotFoundException if the dependency is not found when added to the container
 	 **/
 	@Deprecated(
 		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
@@ -224,9 +230,43 @@ public class SimplyDIContainer(
 	}
 
 	/**
-	 * Метод для получения зависимости из [SimplyDIScope].
+	 * A method for getting a dependency by lazy from [SimplyDIScope].
 	 * @return T
-	 * @throws SimplyDINotFoundException если зависимость не будет найдена без добавления в контейнер
+	 * @throws SimplyDINotFoundException if the dependency is not found when added to the container
+	 **/
+	@Deprecated(
+		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
+		replaceWith = ReplaceWith(
+			expression = "this.getDependency<T>(scopeName)",
+			"su.vi.simply.di.core.utils"
+		),
+		level = DeprecationLevel.WARNING
+	)
+	@Throws(SimplyDINotFoundException::class)
+	public fun <T : Any> getDependencyByLazy(
+		clazz: KClass<*>,
+		scopeName: String = DEFAULT_SCOPE_NAME,
+	): SimplyDILazyWrapper<T> {
+		logger.d(TAG, "$GET_DEP_SINGLE${clazz}")
+		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
+		val dependency = scope.getNullableDependency<T>(clazz)
+			?: findInChainScopes(
+				scopeName = scopeName,
+				clazz = clazz
+			)
+			?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, clazz))
+
+		return SimplyDILazyWrapper(
+			lazyValue = {
+				dependency
+			}
+		)
+	}
+
+	/**
+	 * A method for getting a dependency from [SimplyDIScope].
+	 * @return T
+	 * @throws SimplyDINotFoundException if the dependency is not found without being added to the container
 	 **/
 	@Deprecated(
 		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",

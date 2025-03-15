@@ -2,7 +2,9 @@ package su.vi.simply.di.core.utils
 
 import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.error.SimplyDINotFoundException
+import su.vi.simply.di.core.lazy.SimplyDILazyWrapper
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
+import kotlin.reflect.KClass
 
 /**
  * DSL to create [SimplyDIContainer]
@@ -93,6 +95,18 @@ public class SimplyDIContainerDSL {
 	@Throws(SimplyDINotFoundException::class)
 	public inline fun <reified T> getDependency(): T = simplyDIContainer.getDependency<T>(
 		scopeName = scopeName
+	)
+
+	/**
+	 * Use it to get the dependency.
+	 * @throws SimplyDINotFoundException if the dependency not created you receive.
+	 **/
+	@Throws(SimplyDINotFoundException::class)
+	public inline fun <reified T : Any> getDependencyByLazy(
+		clazz: KClass<T>,
+	): SimplyDILazyWrapper<T> = simplyDIContainer.getDependencyByLazy<T>(
+		scopeName = scopeName,
+		clazz = clazz
 	)
 
 	/**

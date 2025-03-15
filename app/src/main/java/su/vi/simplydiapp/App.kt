@@ -8,6 +8,7 @@ import su.vi.simply.di.core.lazy.SimplyDILazyWrapper
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.simply.di.core.utils.SimplyLogLevel
 import su.vi.simply.di.core.utils.getDependency
+import su.vi.simply.di.core.utils.getDependencyByLazy
 import su.vi.simply.di.core.utils.initializeSimplyDIContainer
 import su.vi.simplydiapp.for_test.AnyClass
 import su.vi.simplydiapp.for_test.TestLazyClass
@@ -71,22 +72,32 @@ class App : Application() {
 				isSearchInScope = true,
 				simplyLogLevel = SimplyLogLevel.FULL
 			) {
-				measureTime {
-					addDependencyLater { AnyClass() }
-				}.let {
-					println(
-						"LAZY(NOT) ADD DEPENDENCY - $it"
-					)
-				}
+				//measureTime {
+				//	addDependencyLater { SimplyDILazyWrapper<AnyClass>(clazz = AnyClass::class) { AnyClass() } }
+				//}.let {
+				//	println(
+				//		"LAZY(NOT) ADD DEPENDENCY - $it"
+				//	)
+				//}
 
-				addDependencyLater { TestLazyClass(anyClass = getDependency()) }
-				measureTime {
-					addDependencyLater { SimplyDILazyWrapper<TestLazyClass>(lazyValue = { getDependency() }) }
-				}.let {
-					println(
-						"LAZY ADD DEPENDENCY - $it"
+				addDependencyLater<TestLazyClass> {
+					TestLazyClass(
+						anyClass = getDependency<AnyClass>(),
+						anyClassInWrapper = getDependencyByLazy<AnyClass>(clazz = AnyClass::class)
 					)
 				}
+				//measureTime {
+				//	addDependencyLater {
+				//		SimplyDILazyWrapper<TestLazyClass>(
+				//			clazz = TestLazyClass::class,
+				//			lazyValue = { getDependency() }
+				//		)
+				//	}
+				//}.let {
+				//	println(
+				//		"LAZY ADD DEPENDENCY - $it"
+				//	)
+				//}
 
 				replaceDependencyLater { AnyClass() }
 				addChainScopes(listOfScopes = listOf("6", "12345", DEFAULT_SCOPE_NAME, "5"))
@@ -104,7 +115,11 @@ class App : Application() {
 		}
 
 		measureTime {
-			SimplyDIContainer.instance.getDependency<AnyClass>("12345")
+			SimplyDIContainer.instance.getDependency<AnyClass>("12345").let {
+				println(
+					it
+				)
+			}
 		}.let {
 			println(
 				"LAZY(NOT1) GET DEPENDENCY- $it"
@@ -120,14 +135,23 @@ class App : Application() {
 		}
 
 		measureTime {
-			SimplyDIContainer.instance.getDependency<SimplyDILazyWrapper<TestLazyClass>>("12345")
+			SimplyDIContainer.instance.getDependencyByLazy<TestLazyClass>("12345", TestLazyClass::class)
 		}.let {
 			println(
-				"LAZY GET DEPENDENCY- $it"
+				"LAZY GET 1 DEPENDENCY- $it"
 			)
 		}
 
-		val test: SimplyDILazyWrapper<TestLazyClass> = SimplyDIContainer.instance.getDependency("12345")
+		measureTime {
+			SimplyDIContainer.instance.getDependencyByLazy<TestLazyClass>("12345", TestLazyClass::class)
+		}.let {
+			println(
+				"LAZY GET 2 DEPENDENCY- $it"
+			)
+		}
+
+		val test: SimplyDILazyWrapper<TestLazyClass> =
+			SimplyDIContainer.instance.getDependencyByLazy<TestLazyClass>("12345", TestLazyClass::class)
 
 		measureTime {
 			test.value
@@ -136,11 +160,28 @@ class App : Application() {
 				"LAZY GET VALUE- $it"
 			)
 		}
+
 		measureTime {
-			test.value.anyClass
+			test.value.anyClass.let {
+				println(
+					it
+				)
+			}
 		}.let {
 			println(
 				"LAZY GET VALUE ANY CLASS- $it"
+			)
+		}
+
+		measureTime {
+			test.value.anyClassInWrapper.value.let {
+				println(
+					it
+				)
+			}
+		}.let {
+			println(
+				"LAZY GET VALUE ANY CLASS in wrapper- $it"
 			)
 		}
 

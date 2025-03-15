@@ -2,6 +2,8 @@ package su.vi.simply.di.core.utils
 
 import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.error.SimplyDINotFoundException
+import su.vi.simply.di.core.lazy.SimplyDILazyWrapper
+import kotlin.reflect.KClass
 
 /**
  * Use it to instantly add a dependency.
@@ -75,6 +77,21 @@ public inline fun <reified T> SimplyDIContainer.getDependency(
 ): T = getDependency(
 	scopeName = scopeName,
 	clazz = T::class
+)
+
+/**
+ * Use it to get the dependency by lazy.
+ * @param scopeName name of your scope.
+ * @throws SimplyDINotFoundException if the dependency not created you receive.
+ **/
+@Suppress("DEPRECATION")
+@Throws(SimplyDINotFoundException::class)
+public inline fun <reified T : Any> SimplyDIContainer.getDependencyByLazy(
+	scopeName: String = this.scopeName,
+	clazz: KClass<T>,
+): SimplyDILazyWrapper<T> = getDependencyByLazy (
+	scopeName = scopeName,
+	clazz = clazz
 )
 
 /**
