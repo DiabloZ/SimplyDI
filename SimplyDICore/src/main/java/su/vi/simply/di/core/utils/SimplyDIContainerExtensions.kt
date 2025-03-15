@@ -2,8 +2,6 @@ package su.vi.simply.di.core.utils
 
 import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.error.SimplyDINotFoundException
-import su.vi.simply.di.core.SimplyDIScope
-import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 
 /**
  * Use it to instantly add a dependency.
