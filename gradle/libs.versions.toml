@@ -19,7 +19,7 @@ minSDKVersionSDK = "21"
 nameSpaceApp = "su.vi.simplydiapp"
 nameSpaceSDK = "su.vi.simplydi"
 vanniktechMavenPublish = "0.30.0"
-commonVersion = "1.0.6"
+commonVersion = "1.0.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
