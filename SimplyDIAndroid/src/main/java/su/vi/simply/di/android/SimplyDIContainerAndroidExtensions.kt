@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.res.Resources
 import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
-import su.vi.simply.di.core.utils.SimplyDIContainerDSL
+import su.vi.simply.di.core.entry_point.SimplyDIContainerDSL
 import su.vi.simply.di.core.utils.SimplyLogLevel
-import su.vi.simply.di.core.utils.initializeSimplyDIContainer
+import su.vi.simply.di.core.entry_point.initializeSimplyDIContainer
 
 /**
  * Initialize method for new container.

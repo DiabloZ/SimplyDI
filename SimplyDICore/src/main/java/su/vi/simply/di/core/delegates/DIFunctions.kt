@@ -3,7 +3,7 @@ package su.vi.simply.di.core.delegates
 import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.error.SimplyDINotFoundException
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
-import su.vi.simply.di.core.utils.getDependency
+import su.vi.simply.di.core.entry_point.getDependency
 
 /**
  * Delegate to get dependency by lazy from [SimplyDIContainer]. You can call it from any place.
@@ -19,7 +19,8 @@ public inline fun <reified T : Any> inject(
 	mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
 ): Lazy<T> = lazy(mode) {
 	SimplyDIContainer.instance.getDependency<T>(
-		scopeName = scopeName
+		scopeName = scopeName,
+		clazz = T::class
 	)
 }
 
@@ -29,6 +30,7 @@ public inline fun <reified T : Any> inject(
 	mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
 ): Lazy<T> = lazy(mode) {
 	container.getDependency<T>(
-		scopeName = container.scopeName
+		scopeName = container.scopeName,
+		clazz = T::class
 	)
 }

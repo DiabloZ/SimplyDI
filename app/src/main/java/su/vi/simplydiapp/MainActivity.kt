@@ -14,8 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import su.vi.simply.di.android.simplyAndroidViewModel
 import su.vi.simply.di.compose.simplyComposeViewModel
+import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.delegates.inject
-import su.vi.simply.di.core.utils.getDependency
+import su.vi.simply.di.core.utils.SimplyLogLevel
+import su.vi.simply.di.core.entry_point.addDependencyLater
+import su.vi.simply.di.core.entry_point.getByClassAnyway
+import su.vi.simply.di.core.entry_point.getDependency
+import su.vi.simply.di.core.entry_point.getDependencyByLazy
+import su.vi.simply.di.core.entry_point.initializeContainer
 import su.vi.simplydiapp.for_test.AnyClass
 import su.vi.simplydiapp.ui.theme.SimplyDITheme
 
@@ -24,10 +30,35 @@ class MainActivity : ComponentActivity() {
 	private val asdass by inject<AnyClass>(scopeName = "1")
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-
-
 		SomePublicClassFromOtherModule.init()
 		SomePublicClassFromOtherModule.getOther()
+		SimplyDIContainer("testSomeContainer2", false).initializeContainer(
+			simplyLogLevel = SimplyLogLevel.FULL,
+		)
+		val container: SimplyDIContainer = SomePublicClassFromOtherModule.container
+		container.addDependencyLater(scopeName = "testSomeContainer2") {
+			AnyClass()
+		}
+
+		val dependency10 = container.getDependency<AnyClass>(scopeName = "testSomeContainer2", clazz = AnyClass::class)
+		val dependency20 =
+			container.getByClassAnyway<AnyClass>(scopeName = "testSomeContainer2", clazz = AnyClass::class)
+		val dependency30 = container.getDependency<AnyClass>(scopeName = "testSomeContainer2", clazz = AnyClass::class)
+		val dependency40 =
+			container.getDependencyByLazy<AnyClass>(scopeName = "testSomeContainer2", clazz = AnyClass::class)
+
+		val dependency01 = container.getDependency<AnyClass>(scopeName = "testSomeContainer2", clazz = AnyClass::class)
+		val dependency02 =
+			container.getByClassAnyway<AnyClass>(scopeName = "testSomeContainer2", clazz = AnyClass::class)
+		val dependency03 = container.getDependency<AnyClass>(scopeName = "testSomeContainer2", clazz = AnyClass::class)
+		val dependency04 =
+			container.getDependencyByLazy<AnyClass>(scopeName = "testSomeContainer2", clazz = AnyClass::class)
+
+
+		assert(dependency10 == dependency01)
+		assert(dependency20 != dependency02)
+		assert(dependency30 == dependency03)
+		assert(dependency40.value == dependency04.value)
 
 		val someStorage = App.container.getDependency<SomeStorage>()
 		val someStorage2 = App.container.getDependency<SomeStorage>()

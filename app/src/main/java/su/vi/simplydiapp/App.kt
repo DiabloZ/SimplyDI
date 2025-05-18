@@ -7,9 +7,9 @@ import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.lazy.SimplyDILazyWrapper
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.simply.di.core.utils.SimplyLogLevel
-import su.vi.simply.di.core.utils.getDependency
-import su.vi.simply.di.core.utils.getDependencyByLazy
-import su.vi.simply.di.core.utils.initializeSimplyDIContainer
+import su.vi.simply.di.core.entry_point.getDependency
+import su.vi.simply.di.core.entry_point.getDependencyByLazy
+import su.vi.simply.di.core.entry_point.initializeSimplyDIContainer
 import su.vi.simplydiapp.for_test.AnyClass
 import su.vi.simplydiapp.for_test.TestLazyClass
 import kotlin.time.ExperimentalTime
@@ -83,7 +83,7 @@ class App : Application() {
 				addDependencyLater<TestLazyClass> {
 					TestLazyClass(
 						anyClass = getDependency<AnyClass>(),
-						anyClassInWrapper = getDependencyByLazy<AnyClass>(clazz = AnyClass::class)
+						anyClassInWrapper = getDependencyByLazy<AnyClass>()
 					)
 				}
 				//measureTime {
@@ -135,7 +135,7 @@ class App : Application() {
 		}
 
 		measureTime {
-			SimplyDIContainer.instance.getDependencyByLazy<TestLazyClass>("12345", TestLazyClass::class)
+			SimplyDIContainer.instance.getDependency<TestLazyClass>(scopeName = "12345", clazz = TestLazyClass::class)
 		}.let {
 			println(
 				"LAZY GET 1 DEPENDENCY- $it"
@@ -143,7 +143,10 @@ class App : Application() {
 		}
 
 		measureTime {
-			SimplyDIContainer.instance.getDependencyByLazy<TestLazyClass>("12345", TestLazyClass::class)
+			SimplyDIContainer.instance.getDependencyByLazy<TestLazyClass>(
+				scopeName = "12345",
+				clazz = TestLazyClass::class
+			)
 		}.let {
 			println(
 				"LAZY GET 2 DEPENDENCY- $it"
@@ -151,7 +154,7 @@ class App : Application() {
 		}
 
 		val test: SimplyDILazyWrapper<TestLazyClass> =
-			SimplyDIContainer.instance.getDependencyByLazy<TestLazyClass>("12345", TestLazyClass::class)
+			SimplyDIContainer.instance.getDependencyByLazy(scopeName = "12345", clazz = TestLazyClass::class)
 
 		measureTime {
 			test.value
@@ -227,7 +230,7 @@ internal class SomeStorageImpl(
 object SomePublicClassFromOtherModule {
 	lateinit var container: SimplyDIContainer
 
-	fun init(){
+	fun init() {
 		container = initializeSimplyDIContainer(CONTAINER_NAME2) {
 			addDependencyLater<SomeStorage> {
 				SomeStorageImpl("secret_shhhhhh...")
@@ -236,7 +239,7 @@ object SomePublicClassFromOtherModule {
 		}
 	}
 
-	fun getOther() :String {
+	fun getOther(): String {
 		val so = container.getDependency<SomeStorage>().getOtherString()
 		return so
 	}

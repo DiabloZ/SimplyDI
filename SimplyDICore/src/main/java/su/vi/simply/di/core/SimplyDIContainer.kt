@@ -21,7 +21,6 @@ import su.vi.simply.di.core.utils.SimplyDIConstants.SCOPE_IS_NOT_INITIALIZED
 import su.vi.simply.di.core.utils.SimplyDIConstants.TAG
 import su.vi.simply.di.core.utils.SimplyDIConstants.TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED
 import su.vi.simply.di.core.utils.SimplyLogLevel
-import su.vi.simply.di.core.utils.addChainScopes
 import su.vi.simply.di.core.utils.toSimplyDILogger
 import kotlin.concurrent.thread
 import kotlin.reflect.KClass
@@ -45,14 +44,6 @@ public class SimplyDIContainer(
 	 * @param isSearchInScope if you want to use this container like data store or you need
 	 * to share dependencies from this container you would set value like true or you can bind them [SimplyDIContainer.addChainScopes] .
 	 */
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.initializeContainer(scopeName, simplyLogLevel, isSearchInScope)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
 	internal fun initialize(
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
@@ -79,33 +70,25 @@ public class SimplyDIContainer(
 	 * @return T
 	 * @throws SimplyDINotFoundException if dependency is not found
 	 **/
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.addDependencyNow(scopeName, clazz, factory)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
 	@Throws(SimplyDINotFoundException::class)
-	public fun <T : Any> addDependencyNow(
+	internal fun <T : Any> addDependencyNow(
 		scopeName: String = DEFAULT_SCOPE_NAME,
-		clazz: KClass<*>,
+		kClass: KClass<*>,
 		factory: () -> T,
 	): Unit = synchronized(this) {
-		if (isDependencyInScope(scopeName = scopeName, clazz = clazz)) {
-			logger.e(TAG, String.format(REPLACE_ERR, clazz, scopeName))
+		if (isDependencyInScope(scopeName = scopeName, kClass = kClass)) {
+			logger.e(TAG, String.format(REPLACE_ERR, kClass, scopeName))
 			return@synchronized
 		}
 		mapContainers[scopeName]?.createDependencyNow(
-			clazz = clazz,
+			kClass = kClass,
 			factory = factory
 		) ?: kotlin.run {
 			throw SimplyDINotFoundException(
-				String.format(TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED, clazz, scopeName)
+				String.format(TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED, kClass, scopeName)
 			)
 		}
-		logger.d(TAG, "$CREATE_DEP_IMMEDIATELY${clazz}")
+		logger.d(TAG, "$CREATE_DEP_IMMEDIATELY${kClass}")
 	}
 
 	/**
@@ -113,92 +96,58 @@ public class SimplyDIContainer(
 	 * @return T
 	 * @throws SimplyDINotFoundException if dependency is not found
 	 **/
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.addDependencyLater<T>(scopeName, factory)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
 	@Throws(SimplyDINotFoundException::class)
-	public fun <T : Any> addDependencyLater(
+	internal fun <T : Any> addDependencyLater(
 		scopeName: String = DEFAULT_SCOPE_NAME,
-		clazz: KClass<*>,
+		kClass: KClass<*>,
 		factory: () -> T,
 	): Unit = synchronized(this) {
-		if (isDependencyInScope(scopeName = scopeName, clazz = clazz)) {
-			logger.e(TAG, String.format(REPLACE_ERR, clazz, scopeName))
+		if (isDependencyInScope(scopeName = scopeName, kClass = kClass)) {
+			logger.e(TAG, String.format(REPLACE_ERR, kClass, scopeName))
 			return@synchronized
 		}
 		mapContainers[scopeName]?.createDependencyLater(
-			clazz = clazz,
+			kClass = kClass,
 			factory = factory
 		) ?: kotlin.run {
 			throw SimplyDINotFoundException(
-				String.format(TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED, clazz, scopeName)
+				String.format(TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED, kClass, scopeName)
 			)
 		}
-		logger.d(TAG, "$CREATE_DEP_LAZY${clazz}")
+		logger.d(TAG, "$CREATE_DEP_LAZY${kClass}")
 	}
 
-	@Suppress("DEPRECATION")
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.replaceDependencyNow<T>(scopeName, factory)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
-	public fun <T : Any> replaceDependencyNow(
+	internal fun <T : Any> replaceDependencyNow(
 		scopeName: String = DEFAULT_SCOPE_NAME,
-		clazz: KClass<*>,
+		kClass: KClass<*>,
 		factory: () -> T,
 	) {
-		deleteDependency(clazz = clazz, scopeName = scopeName)
-		addDependencyNow(scopeName = scopeName, clazz = clazz, factory = factory)
+		deleteDependency(kClass = kClass, scopeName = scopeName)
+		addDependencyNow(scopeName = scopeName, kClass = kClass, factory = factory)
 	}
 
-	@Suppress("DEPRECATION")
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.replaceDependencyLater<T>(scopeName, factory)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
-	public fun <T : Any> replaceDependencyLater(
+	internal fun <T : Any> replaceDependencyLater(
 		scopeName: String = DEFAULT_SCOPE_NAME,
-		clazz: KClass<*>,
+		kClass: KClass<*>,
 		factory: () -> T,
 	) {
-		deleteDependency(clazz = clazz, scopeName = scopeName)
-		addDependencyLater(scopeName = scopeName, clazz = clazz, factory = factory)
+		deleteDependency(kClass = kClass, scopeName = scopeName)
+		addDependencyLater(scopeName = scopeName, kClass = kClass, factory = factory)
 	}
 
 	/**
 	 * Method for removing dependencies from initialized [SimplyDIScope] and a constructor for initialization.
 	 **/
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.deleteDependency<T>(scopeName)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
-	public fun deleteDependency(
-		clazz: KClass<*>,
+	internal fun deleteDependency(
 		scopeName: String = DEFAULT_SCOPE_NAME,
+		kClass: KClass<*>,
 	): Unit = synchronized(this) {
 		mapContainers[scopeName]?.apply {
-			delete(clazz)
-			logger.d(TAG, "$DELETE_DEP${clazz}")
+			delete(kClass)
+			logger.d(TAG, "$DELETE_DEP${kClass}")
 			return@synchronized
 		}
-		logger.d(TAG, "$DELETE_DEP_ERR${clazz}")
+		logger.d(TAG, "$DELETE_DEP_ERR${kClass}")
 	}
 
 	/**
@@ -206,27 +155,19 @@ public class SimplyDIContainer(
 	 * @return T
 	 * @throws SimplyDINotFoundException if the dependency is not found when added to the container
 	 **/
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.getDependency<T>(scopeName)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
 	@Throws(SimplyDINotFoundException::class)
-	public fun <T : Any> getDependency(
-		clazz: KClass<*>,
+	internal fun <T : Any> getDependency(
+		kClass: KClass<*>,
 		scopeName: String = DEFAULT_SCOPE_NAME,
 	): T {
-		logger.d(TAG, "$GET_DEP_SINGLE${clazz}")
+		logger.d(TAG, "$GET_DEP_SINGLE${kClass}")
 		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
-		return scope.getNullableDependency(clazz)
+		return scope.getNullableDependency(kClass)
 			?: findInChainScopes(
 				scopeName = scopeName,
-				clazz = clazz
+				kClass = kClass
 			)
-			?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, clazz))
+			?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
 	}
 
 	/**
@@ -234,27 +175,19 @@ public class SimplyDIContainer(
 	 * @return T
 	 * @throws SimplyDINotFoundException if the dependency is not found when added to the container
 	 **/
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.getDependency<T>(scopeName)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
 	@Throws(SimplyDINotFoundException::class)
-	public fun <T : Any> getDependencyByLazy(
-		clazz: KClass<*>,
+	internal fun <T : Any> getDependencyByLazy(
 		scopeName: String = DEFAULT_SCOPE_NAME,
+		kClass: KClass<*>,
 	): SimplyDILazyWrapper<T> {
-		logger.d(TAG, "$GET_DEP_SINGLE${clazz}")
+		logger.d(TAG, "$GET_DEP_SINGLE${kClass}")
 		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
-		val dependency = scope.getNullableDependency<T>(clazz)
+		val dependency = scope.getNullableDependency<T>(kClass)
 			?: findInChainScopes(
 				scopeName = scopeName,
-				clazz = clazz
+				kClass = kClass
 			)
-			?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, clazz))
+			?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
 
 		return SimplyDILazyWrapper(
 			lazyValue = {
@@ -268,78 +201,46 @@ public class SimplyDIContainer(
 	 * @return T
 	 * @throws SimplyDINotFoundException if the dependency is not found without being added to the container
 	 **/
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.getFactoryDependency<T>(scopeName)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
 	@Throws(SimplyDINotFoundException::class)
-	public fun <T : Any> getFactoryDependency(
-		clazz: KClass<*>,
+	internal fun <T : Any> getFactoryDependency(
 		scopeName: String = DEFAULT_SCOPE_NAME,
+		kClass: KClass<*>,
 	): T {
-		logger.d(TAG, "$GET_DEP_FACTORY${clazz} ")
-		return mapContainers[scopeName]?.getFactoryDependency(clazz = clazz)
+		logger.d(TAG, "$GET_DEP_FACTORY${kClass} ")
+		return mapContainers[scopeName]?.getFactoryDependency(kClass = kClass)
 			?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
 	}
 
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.getByClassAnyway<T>(scopeName)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
 	@Suppress("UNCHECKED_CAST")
 	@Throws(SimplyDINotFoundException::class)
-	public fun <T : Any> getByClassAnyway(
+	internal fun <T : Any> getByClassAnyway(
 		scopeName: String = DEFAULT_SCOPE_NAME,
-		clazz: KClass<*>,
+		kClass: KClass<*>,
 	): T {
-		logger.d(TAG, "$GET_DEP_FACTORY_WITH_ERROR${clazz}")
+		logger.d(TAG, "$GET_DEP_FACTORY_WITH_ERROR${kClass}")
 		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
-		return scope.getByClass(clazz)
+		return scope.getByClass(kClass)
 			?: mapContainers.asSequence()
 				.filter { entry -> entry.value.isSearchInScope }
-				.mapNotNull { diScopeEntry -> diScopeEntry.value.getByClass(clazz) }
+				.mapNotNull { diScopeEntry -> diScopeEntry.value.getByClass(kClass) }
 				.firstOrNull() as? T
 			?: findInChainScopes(
 				scopeName = scopeName,
-				clazz = clazz
+				kClass = kClass
 			)
-			?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, clazz))
+			?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
 	}
 
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.getByClass<T>(scopeName)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
 	@Throws(SimplyDINotFoundException::class)
-	public fun <T : Any> getByClass(
+	internal fun <T : Any> getByClass(
 		scopeName: String = DEFAULT_SCOPE_NAME,
-		clazz: KClass<*>,
+		kClass: KClass<*>,
 	): T? {
-		logger.d(TAG, "$GET_DEP_FACTORY_NULLABLE${clazz}")
+		logger.d(TAG, "$GET_DEP_FACTORY_NULLABLE${kClass}")
 		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
-		return scope.getByClass(clazz)
+		return scope.getByClass(kClass)
 	}
 
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.addChainScopes<T>(listOfScopes)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
 	internal fun addChainScopes(
 		listOfScopes: List<String>,
 	): Unit = synchronized(this) {
@@ -357,14 +258,6 @@ public class SimplyDIContainer(
 		}
 	}
 
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.deleteChainedScopes<T>(listOfScopes)",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
 	internal fun deleteChainedScopes(
 		listOfScopes: List<String>,
 	): Unit = synchronized(this) {
@@ -381,18 +274,18 @@ public class SimplyDIContainer(
 	}
 
 	private fun isDependencyInScope(
-		clazz: KClass<*>,
 		scopeName: String = DEFAULT_SCOPE_NAME,
-	): Boolean = mapContainers[scopeName]?.isDependencyInScope(clazz = clazz) == true
+		kClass: KClass<*>,
+	): Boolean = mapContainers[scopeName]?.isDependencyInScope(kClass = kClass) == true
 
 	private fun <T : Any> findInChainScopes(
-		clazz: KClass<*>,
 		scopeName: String = DEFAULT_SCOPE_NAME,
+		kClass: KClass<*>,
 	): T? {
 		chainedScopes[scopeName]?.forEach { chainedScopes ->
 			chainedScopes.forEach { chainedName ->
 				if (scopeName != chainedName) {
-					mapContainers[chainedName]?.getNullableDependency<T>(clazz = clazz)?.let { dependency ->
+					mapContainers[chainedName]?.getNullableDependency<T>(kClass = kClass)?.let { dependency ->
 						return dependency
 					}
 				}
@@ -401,18 +294,10 @@ public class SimplyDIContainer(
 		return null
 	}
 
-	@Suppress("UNCHECKED_CAST", "DEPRECATION")
-	@Deprecated(
-		message = "Pls don't use methods directly. It can cause problem with binary compatibility.",
-		replaceWith = ReplaceWith(
-			expression = "this.depBenchmark<T>()",
-			"su.vi.simply.di.core.utils"
-		),
-		level = DeprecationLevel.WARNING
-	)
+	@Suppress("UNCHECKED_CAST")
 	@OptIn(ExperimentalTime::class)
-	public fun <T : Any> depBenchmark(
-		clazz: KClass<*>,
+	internal fun <T : Any> depBenchmark(
+		kClass: KClass<*>,
 	) {
 		val mainTimes = 10
 		val times = 100
@@ -429,7 +314,7 @@ public class SimplyDIContainer(
 					seqTimer += measureTime {
 						mapContainers.asSequence()
 							.filter { entry -> entry.value.isSearchInScope }
-							.mapNotNull { diScopeEntry -> diScopeEntry.value.getByClass(clazz) }
+							.mapNotNull { diScopeEntry -> diScopeEntry.value.getByClass(kClass) }
 							.firstOrNull() as? T
 					}.inWholeMicroseconds
 
@@ -438,13 +323,13 @@ public class SimplyDIContainer(
 					usuTimer += measureTime {
 						mapContainers
 							.filter { entry -> entry.value.isSearchInScope }
-							.mapNotNull { diScopeEntry -> diScopeEntry.value.getByClass(clazz) }
+							.mapNotNull { diScopeEntry -> diScopeEntry.value.getByClass(kClass) }
 							.firstOrNull() as? T
 					}.inWholeMicroseconds
 				}
 				repeat(times) {
 					syncTimer += measureTime {
-						getByClassAnyway(clazz = clazz)
+						getByClassAnyway(kClass = kClass)
 					}.inWholeMicroseconds
 				}
 				mainusuTimer += usuTimer
@@ -460,7 +345,8 @@ public class SimplyDIContainer(
 		}
 	}
 
-	private fun List<String>.logString() = joinToString(prefix = PRE_POST_QUOTES, separator = MIDDLE_QUOTES, postfix = PRE_POST_QUOTES)
+	private fun List<String>.logString() =
+		joinToString(prefix = PRE_POST_QUOTES, separator = MIDDLE_QUOTES, postfix = PRE_POST_QUOTES)
 
 	public companion object {
 		private const val PRE_POST_QUOTES = "\""

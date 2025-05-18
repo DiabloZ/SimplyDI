@@ -1,10 +1,10 @@
-package su.vi.simply.di.core.utils
+package su.vi.simply.di.core.entry_point
 
 import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.error.SimplyDINotFoundException
 import su.vi.simply.di.core.lazy.SimplyDILazyWrapper
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
-import kotlin.reflect.KClass
+import su.vi.simply.di.core.utils.SimplyLogLevel
 
 /**
  * DSL to create [SimplyDIContainer]
@@ -24,7 +24,7 @@ public class SimplyDIContainerDSL {
 	 * Initialize method for new container.
 	 * @param scopeName name of the new container.
 	 * @param simplyLogLevel where you can set level of logs for you needs for example for release
-	 * would do use [SimplyLogLevel.EMPTY] for debug [SimplyLogLevel.FULL].
+	 * would do use [su.vi.simply.di.core.utils.SimplyLogLevel.EMPTY] for debug [su.vi.simply.di.core.utils.SimplyLogLevel.FULL].
 	 * @param isSearchInScope if you want to use this container like data store or you need
 	 * to share dependencies from this container you would set value like true or you can bind them [SimplyDIContainer.addChainScopes].
 	 */
@@ -52,6 +52,7 @@ public class SimplyDIContainerDSL {
 		noinline factory: () -> T,
 	): Unit = simplyDIContainer.addDependencyNow<T>(
 		scopeName = scopeName,
+		clazz = T::class,
 		factory = factory
 	)
 
@@ -63,6 +64,7 @@ public class SimplyDIContainerDSL {
 		noinline factory: () -> T,
 	): Unit = simplyDIContainer.addDependencyLater<T>(
 		scopeName = scopeName,
+		clazz = T::class,
 		factory = factory
 	)
 
@@ -74,6 +76,7 @@ public class SimplyDIContainerDSL {
 		noinline factory: () -> T,
 	): Unit = simplyDIContainer.replaceDependencyNow<T>(
 		scopeName = scopeName,
+		clazz = T::class,
 		factory = factory
 	)
 
@@ -85,6 +88,7 @@ public class SimplyDIContainerDSL {
 		noinline factory: () -> T,
 	): Unit = simplyDIContainer.replaceDependencyLater<T>(
 		scopeName = scopeName,
+		clazz = T::class,
 		factory = factory
 	)
 
@@ -94,7 +98,8 @@ public class SimplyDIContainerDSL {
 	 **/
 	@Throws(SimplyDINotFoundException::class)
 	public inline fun <reified T> getDependency(): T = simplyDIContainer.getDependency<T>(
-		scopeName = scopeName
+		scopeName = scopeName,
+		clazz = T::class
 	)
 
 	/**
@@ -102,34 +107,34 @@ public class SimplyDIContainerDSL {
 	 * @throws SimplyDINotFoundException if the dependency not created you receive.
 	 **/
 	@Throws(SimplyDINotFoundException::class)
-	public inline fun <reified T : Any> getDependencyByLazy(
-		clazz: KClass<T>,
-	): SimplyDILazyWrapper<T> = simplyDIContainer.getDependencyByLazy<T>(
-		scopeName = scopeName,
-		clazz = clazz
-	)
+	public inline fun <reified T : Any> getDependencyByLazy(): SimplyDILazyWrapper<T> =
+		simplyDIContainer.getDependencyByLazy(
+			scopeName = scopeName,
+			clazz = T::class
+		)
 
 	/**
 	 * Use it to get new dependency every call.
 	 * @throws SimplyDINotFoundException if the dependency not created you receive.
 	 **/
 	@Throws(SimplyDINotFoundException::class)
-	public inline fun <reified T> getFactoryDependency(): T = simplyDIContainer.getFactoryDependency<T>(
-		scopeName = scopeName
+	public inline fun <reified T : Any> getFactoryDependency(): T = simplyDIContainer.getFactoryDependency<T>(
+		scopeName = scopeName,
+		clazz = T::class
 	)
 
 	/**
 	 * Use it to delete the dependency from scope.
 	 **/
-	public inline fun <reified T : Any> deleteDependency(): Unit = simplyDIContainer.deleteDependency<T>(
-		scopeName = scopeName
+	public inline fun <reified T : Any> deleteDependency(): Unit = simplyDIContainer.deleteDependency(
+		scopeName = scopeName,
+		clazz = T::class
 	)
 
 	/**
 	 * Use it to bind scopes.
 	 * @param listOfScopes List of names of scopes.
 	 **/
-	@Suppress("DEPRECATION")
 	public fun addChainScopes(listOfScopes: List<String>): Unit = simplyDIContainer.addChainScopes(
 		listOfScopes = listOfScopes
 	)
@@ -138,7 +143,6 @@ public class SimplyDIContainerDSL {
 	 * Use it to delete bind of scopes.
 	 * @param listOfScopes List of names of scopes.
 	 **/
-	@Suppress("DEPRECATION")
 	public fun deleteChainedScopes(listOfScopes: List<String>): Unit = simplyDIContainer.deleteChainedScopes(
 		listOfScopes = listOfScopes
 	)

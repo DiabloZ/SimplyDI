@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.error.SimplyDINotFoundException
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
+import su.vi.simply.di.core.entry_point.getByClassAnyway
 import kotlin.reflect.KClass
 
 /**
@@ -19,7 +20,6 @@ internal class SimplyViewModelFactory(
 	private val scopeName: String = DEFAULT_SCOPE_NAME,
 ) : ViewModelProvider.Factory {
 
-	@Suppress("DEPRECATION")
 	@Throws(SimplyDINotFoundException::class)
 	override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
 		return SimplyDIContainer.instance.getByClassAnyway(clazz = clazz, scopeName = scopeName)

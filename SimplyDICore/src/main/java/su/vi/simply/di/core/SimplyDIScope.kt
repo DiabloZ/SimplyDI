@@ -2,7 +2,6 @@ package su.vi.simply.di.core
 
 import su.vi.simply.di.core.error.SimplyDINotFoundException
 import su.vi.simply.di.core.utils.SimplyDIConstants.NOT_FOUND_ERROR
-import su.vi.simply.di.core.utils.addChainScopes
 import kotlin.reflect.KClass
 
 /**
@@ -11,7 +10,7 @@ import kotlin.reflect.KClass
  * to share dependencies from this container you would set value like true or you can bind them [SimplyDIContainer.addChainScopes].
  */
 internal class SimplyDIScope(
-	val isSearchInScope: Boolean
+	val isSearchInScope: Boolean,
 ) {
 
 	private val initializerFactory: MutableMap<Any, () -> Any> = mutableMapOf()
@@ -21,15 +20,15 @@ internal class SimplyDIScope(
 	/**
 	 * Use it to get dependencies with store it in list of dependencies.
 	 * If the dependency not created you receive null.
-	 * @param clazz T::class of your dependency.
+	 * @param kClass T::class of your dependency.
 	 * @return T?
 	 **/
 	@Suppress("UNCHECKED_CAST")
-	internal fun <T: Any> getNullableDependency(clazz: KClass<*>): T? {
-		val dependency = listOfDependencies[clazz] ?: run {
-			val newInstance = initializerFactory[clazz]?.invoke()
+	internal fun <T : Any> getNullableDependency(kClass: KClass<*>): T? {
+		val dependency = listOfDependencies[kClass] ?: run {
+			val newInstance = initializerFactory[kClass]?.invoke()
 				?: return null
-			listOfDependencies[clazz] = newInstance
+			listOfDependencies[kClass] = newInstance
 			listOfDependencies[newInstance] = newInstance
 			newInstance
 		}
@@ -38,89 +37,89 @@ internal class SimplyDIScope(
 
 	/**
 	 * Use it to get dependencies with store it in list of dependencies.
-	 * @param clazz T::class of your dependency.
+	 * @param kClass T::class of your dependency.
 	 * @return T
 	 * @throws SimplyDINotFoundException if the dependency not created you receive.
 	 **/
 	@Throws(SimplyDINotFoundException::class)
-	internal fun <T: Any> getDependency(clazz: KClass<*>): T {
-		return getNullableDependency<T>(clazz = clazz)
-			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, clazz.simpleName))
+	internal fun <T : Any> getDependency(kClass: KClass<*>): T {
+		return getNullableDependency<T>(kClass = kClass)
+			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, kClass.simpleName))
 	}
 
 	/**
 	 * Use it to get dependencies without store it in list of dependencies.
-	 * @param clazz T::class of your dependency.
+	 * @param kClass T::class of your dependency.
 	 * @return T
 	 * @throws SimplyDINotFoundException if the dependency not created you receive.
 	 **/
 	@Suppress("UNCHECKED_CAST")
-	internal fun <T: Any> getFactoryDependency(clazz: KClass<*>): T {
-		return initializerFactory[clazz]?.invoke() as? T
-			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, clazz.simpleName))
+	internal fun <T : Any> getFactoryDependency(kClass: KClass<*>): T {
+		return initializerFactory[kClass]?.invoke() as? T
+			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, kClass.simpleName))
 	}
 
 	/**
 	 * Use it to get dependencies without store it in list of dependencies.
 	 * If the dependency not created you receive null.
-	 * @param clazz T::class of your dependency.
+	 * @param kClass T::class of your dependency.
 	 * @return T?
 	 **/
 	@Suppress("UNCHECKED_CAST")
-	internal fun <T: Any> getByClass(
-		clazz: KClass<*>,
+	internal fun <T : Any> getByClass(
+		kClass: KClass<*>,
 	): T? {
- 		return initializerFactory[clazz]?.invoke() as? T
+		return initializerFactory[kClass]?.invoke() as? T
 	}
 
 	/**
 	 * Use it to get dependencies without store it in list of dependencies.
-	 * @param clazz T::class of your dependency.
+	 * @param kClass T::class of your dependency.
 	 * @return T
 	 * @throws SimplyDINotFoundException if the dependency not created you receive.
 	 **/
 	@Suppress("UNCHECKED_CAST")
 	internal fun <T> getByClassAnyway(
-		clazz: KClass<*>,
+		kClass: KClass<*>,
 	): T {
-		return initializerFactory[clazz]?.invoke() as? T
-			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, clazz.simpleName))
+		return initializerFactory[kClass]?.invoke() as? T
+			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, kClass.simpleName))
 	}
 
 	/**
 	 * Use it to create dependency by lazy.
 	 **/
-	internal fun <T: Any> createDependencyLater(
-		clazz: KClass<*>,
-		factory: () -> T
+	internal fun <T : Any> createDependencyLater(
+		kClass: KClass<*>,
+		factory: () -> T,
 	) {
-		initializerFactory[clazz] = factory
+		initializerFactory[kClass] = factory
 	}
 
 	/**
 	 * Use it to create dependency by lazy but in same time will created dependency in scope.
-	 * @param clazz T::class of your dependency.
+	 * @param kClass T::class of your dependency.
 	 * @param factory lambda with your dependency.
 	 **/
-	internal fun <T: Any> createDependencyNow(
-		clazz: KClass<*>,
-		factory: () -> T
+	internal fun <T : Any> createDependencyNow(
+		kClass: KClass<*>,
+		factory: () -> T,
 	) {
-		initializerFactory[clazz] = factory
-		listOfDependencies[clazz] = factory.invoke()
+		initializerFactory[kClass] = factory
+		listOfDependencies[kClass] = factory.invoke()
 	}
 
 	/**
 	 * Use it if you need to delete dependency.
-	 * @param clazz T::class of your dependency.
+	 * @param kClass T::class of your dependency.
 	 **/
 	internal fun delete(
-		clazz: KClass<*>,
+		kClass: KClass<*>,
 	) {
-		initializerFactory.remove(clazz)
+		initializerFactory.remove(kClass)
 
 		listOfDependencies
-			.filter { dependency -> dependency == clazz }
+			.filter { dependency -> dependency == kClass }
 			.forEach {
 				listOfDependencies.remove(it)
 			}
@@ -128,10 +127,9 @@ internal class SimplyDIScope(
 
 	/**
 	 * Use it to check opportunity create the dependency.
-	 * @param clazz T::class of your dependency.
+	 * @param kClass T::class of your dependency.
 	 **/
-	internal fun isDependencyInScope(clazz: KClass<*>): Boolean {
-		return initializerFactory.containsKey(clazz) || listOfDependencies.any { it == clazz }
+	internal fun isDependencyInScope(kClass: KClass<*>): Boolean {
+		return initializerFactory.containsKey(kClass) || listOfDependencies.any { it == kClass }
 	}
-
 }
