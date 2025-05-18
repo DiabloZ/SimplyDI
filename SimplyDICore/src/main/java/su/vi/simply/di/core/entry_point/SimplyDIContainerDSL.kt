@@ -157,7 +157,7 @@ public class SimplyDIContainerDSL {
  * to share dependencies from this container you would set value like true or you can bind them [SimplyDIContainerDSL.addChainScopes].
  * @param builder context of [SimplyDIContainerDSL] where you can interact with [SimplyDIContainer] more convenient.
  */
-public fun initializeSimplyDIContainer(
+public fun SimplyDIContainer.Companion.initialize(
 	scopeName: String = DEFAULT_SCOPE_NAME,
 	simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
 	isSearchInScope: Boolean = true,

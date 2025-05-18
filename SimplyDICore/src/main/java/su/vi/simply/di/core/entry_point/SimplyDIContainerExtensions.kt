@@ -39,6 +39,20 @@ public fun <T : Any> SimplyDIContainer.addDependencyNow(
 )
 
 /**
+ * Use it to instantly add a dependency.
+ * @param clazz KClass of your dependency.
+ * @param factory with your dependency.
+ **/
+public fun <T : Any> SimplyDIContainer.addDependencyNow(
+	clazz: KClass<*>,
+	factory: () -> T,
+): Unit = addDependencyNow(
+	scopeName = scopeName,
+	kClass = clazz,
+	factory = factory
+)
+
+/**
  * Use it to add a dependency by lazy.
  * @param scopeName name of your scope.
  * @param factory with your dependency.
@@ -60,6 +74,20 @@ public inline fun <reified T : Any> SimplyDIContainer.addDependencyLater(
  **/
 public fun <T : Any> SimplyDIContainer.addDependencyLater(
 	scopeName: String = this.scopeName,
+	clazz: KClass<*>,
+	factory: () -> T,
+): Unit = addDependencyLater(
+	scopeName = scopeName,
+	kClass = clazz,
+	factory = factory
+)
+
+/**
+ * Use it to add a dependency by lazy.
+ * @param clazz KClass of your dependency.
+ * @param factory with your dependency.
+ **/
+public fun <T : Any> SimplyDIContainer.addDependencyLater(
 	clazz: KClass<*>,
 	factory: () -> T,
 ): Unit = addDependencyLater(
@@ -100,6 +128,20 @@ public fun <T : Any> SimplyDIContainer.replaceDependencyNow(
 
 /**
  * Use it to replace a dependency.
+ * @param clazz KClass of your dependency.
+ * @param factory with your dependency.
+ **/
+public fun <T : Any> SimplyDIContainer.replaceDependencyNow(
+	clazz: KClass<*>,
+	factory: () -> T,
+): Unit = replaceDependencyNow(
+	scopeName = scopeName,
+	kClass = clazz,
+	factory = factory
+)
+
+/**
+ * Use it to replace a dependency.
  * @param scopeName name of your scope.
  * @param factory with your dependency.
  **/
@@ -120,6 +162,19 @@ public inline fun <reified T : Any> SimplyDIContainer.replaceDependencyLater(
  **/
 public fun <T : Any> SimplyDIContainer.replaceDependencyLater(
 	scopeName: String = this.scopeName,
+	clazz: KClass<*>,
+	factory: () -> T,
+): Unit = replaceDependencyLater(
+	scopeName = scopeName,
+	kClass = clazz,
+	factory = factory
+)
+/**
+ * Use it to replace a dependency.
+ * @param clazz KClass of your dependency.
+ * @param factory with your dependency.
+ **/
+public fun <T : Any> SimplyDIContainer.replaceDependencyLater(
 	clazz: KClass<*>,
 	factory: () -> T,
 ): Unit = replaceDependencyLater(
@@ -157,6 +212,19 @@ public fun <T> SimplyDIContainer.getDependency(
 )
 
 /**
+ * Use it to get the dependency.
+ * @param clazz KClass of your dependency.
+ * @throws SimplyDINotFoundException if the dependency not created you receive.
+ **/
+@Throws(SimplyDINotFoundException::class)
+public fun <T> SimplyDIContainer.getDependency(
+	clazz: KClass<*>,
+): T = getDependency(
+	scopeName = scopeName,
+	kClass = clazz
+)
+
+/**
  * Use it to get a dependency from you scope or chained scopes each time new.
  * @param scopeName name of your scope.
  * @throws SimplyDINotFoundException if the dependency not created you receive.
@@ -171,13 +239,26 @@ public inline fun <reified T> SimplyDIContainer.getByClassAnyway(
 
 /**
  * Use it to get a dependency from you scope or chained scopes each time new.
- * @param scopeName name of your scope.\
+ * @param scopeName name of your scope.
  * @param clazz KClass of your dependency.
  * @throws SimplyDINotFoundException if the dependency not created you receive.
  **/
 @Throws(SimplyDINotFoundException::class)
 public fun <T> SimplyDIContainer.getByClassAnyway(
 	scopeName: String = this.scopeName,
+	clazz: KClass<*>,
+): T = getByClassAnyway(
+	scopeName = scopeName,
+	kClass = clazz
+)
+
+/**
+ * Use it to get a dependency from you scope or chained scopes each time new.
+ * @param clazz KClass of your dependency.
+ * @throws SimplyDINotFoundException if the dependency not created you receive.
+ **/
+@Throws(SimplyDINotFoundException::class)
+public fun <T> SimplyDIContainer.getByClassAnyway(
 	clazz: KClass<*>,
 ): T = getByClassAnyway(
 	scopeName = scopeName,
@@ -213,6 +294,19 @@ public fun <T : Any> SimplyDIContainer.getDependencyByLazy(
 )
 
 /**
+ * Use it to get the dependency by lazy.
+ * @param clazz KClass of your dependency.
+ * @throws SimplyDINotFoundException if the dependency not created you receive.
+ **/
+@Throws(SimplyDINotFoundException::class)
+public fun <T : Any> SimplyDIContainer.getDependencyByLazy(
+	clazz: KClass<*>,
+): SimplyDILazyWrapper<T> = getDependencyByLazy(
+	scopeName = scopeName,
+	kClass = clazz
+)
+
+/**
  * Use it to get new dependency every call.
  * @param scopeName name of your scope.
  * @throws SimplyDINotFoundException if the dependency not created you receive.
@@ -241,6 +335,19 @@ public fun <T : Any> SimplyDIContainer.getFactoryDependency(
 )
 
 /**
+ * Use it to get new dependency every call.
+ * @param clazz KClass of your dependency.
+ * @throws SimplyDINotFoundException if the dependency not created you receive.
+ **/
+@Throws(SimplyDINotFoundException::class)
+public fun <T : Any> SimplyDIContainer.getFactoryDependency(
+	clazz: KClass<*>,
+): T = getFactoryDependency(
+	scopeName = scopeName,
+	kClass = clazz
+)
+
+/**
  * Use it to delete the dependency from scope.
  * @param scopeName name of your scope.
  **/
@@ -258,6 +365,17 @@ public inline fun <reified T : Any> SimplyDIContainer.deleteDependency(
  **/
 public fun SimplyDIContainer.deleteDependency(
 	scopeName: String = this.scopeName,
+	clazz: KClass<*>,
+): Unit = deleteDependency(
+	kClass = clazz,
+	scopeName = scopeName
+)
+
+/**
+ * Use it to delete the dependency from scope.
+ * @param clazz KClass of your dependency.
+ **/
+public fun SimplyDIContainer.deleteDependency(
 	clazz: KClass<*>,
 ): Unit = deleteDependency(
 	kClass = clazz,

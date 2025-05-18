@@ -7,7 +7,7 @@ import su.vi.simply.di.core.SimplyDIContainer
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.simply.di.core.entry_point.SimplyDIContainerDSL
 import su.vi.simply.di.core.utils.SimplyLogLevel
-import su.vi.simply.di.core.entry_point.initializeSimplyDIContainer
+import su.vi.simply.di.core.entry_point.initialize
 
 /**
  * Initialize method for new container.
@@ -18,13 +18,13 @@ import su.vi.simply.di.core.entry_point.initializeSimplyDIContainer
  * to share dependencies from this container you would set value like true or you can bind them [SimplyDIContainerDSL.addChainScopes].
  * @param builder context of [SimplyDIContainerDSL] where you can interact with [SimplyDIContainer] more convenient.
  */
-public fun initializeSimplyDIAndroidContainer(
+public fun SimplyDIContainer.Companion.initializeAndroid(
 	application: Application,
 	scopeName: String = DEFAULT_SCOPE_NAME,
 	simplyLogLevel: SimplyLogLevel = SimplyLogLevel.EMPTY,
 	isSearchInScope: Boolean = true,
 	builder: SimplyDIContainerDSL.() -> Unit,
-): SimplyDIContainer = initializeSimplyDIContainer(
+): SimplyDIContainer = initialize(
 	scopeName = scopeName,
 	simplyLogLevel = simplyLogLevel,
 	isSearchInScope = isSearchInScope

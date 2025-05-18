@@ -2,14 +2,16 @@ package su.vi.simplydiapp
 
 import android.app.Application
 import android.util.Log
-import su.vi.simply.di.android.initializeSimplyDIAndroidContainer
+import su.vi.simply.di.android.initializeAndroid
 import su.vi.simply.di.core.SimplyDIContainer
+import su.vi.simply.di.core.entry_point.addDependencyLater
 import su.vi.simply.di.core.lazy.SimplyDILazyWrapper
 import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.simply.di.core.utils.SimplyLogLevel
 import su.vi.simply.di.core.entry_point.getDependency
 import su.vi.simply.di.core.entry_point.getDependencyByLazy
-import su.vi.simply.di.core.entry_point.initializeSimplyDIContainer
+import su.vi.simply.di.core.entry_point.initialize
+import su.vi.simply.di.core.entry_point.initializeContainer
 import su.vi.simplydiapp.for_test.AnyClass
 import su.vi.simplydiapp.for_test.TestLazyClass
 import kotlin.time.ExperimentalTime
@@ -44,30 +46,30 @@ class App : Application() {
 			replaceDependencyLater<AnyClass>(scopeName = "12345") { AnyClass() }
 			addChainScopes( listOfScopes = listOf("6", "12345", DEFAULT_SCOPE_NAME, "5"))
 			*/
-			initializeSimplyDIAndroidContainer(application = this, simplyLogLevel = SimplyLogLevel.FULL) {
+			SimplyDIContainer.initializeAndroid(application = this, simplyLogLevel = SimplyLogLevel.FULL) {
 
 			}
-			initializeSimplyDIContainer(simplyLogLevel = SimplyLogLevel.FULL) {
+			SimplyDIContainer.initialize(simplyLogLevel = SimplyLogLevel.FULL) {
 				addDependencyNow { AnyClass() }
 			}
-			initializeSimplyDIContainer(scopeName = "6", isSearchInScope = false) {}
-			initializeSimplyDIContainer(
+			SimplyDIContainer.initialize(scopeName = "6", isSearchInScope = false) {}
+			SimplyDIContainer.initialize(
 				scopeName = "6",
 				isSearchInScope = false,
 				simplyLogLevel = SimplyLogLevel.FULL
 			) {}
-			initializeSimplyDIContainer(scopeName = "5", isSearchInScope = true) {}
-			initializeSimplyDIContainer(
+			SimplyDIContainer.initialize(scopeName = "5", isSearchInScope = true) {}
+			SimplyDIContainer.initialize(
 				scopeName = "4",
 				isSearchInScope = false,
 				simplyLogLevel = SimplyLogLevel.FULL
 			) {}
-			initializeSimplyDIContainer(scopeName = "3", isSearchInScope = true) {}
-			initializeSimplyDIContainer(scopeName = "2", isSearchInScope = true) {}
-			initializeSimplyDIContainer(scopeName = "1", isSearchInScope = true) {
+			SimplyDIContainer.initialize(scopeName = "3", isSearchInScope = true) {}
+			SimplyDIContainer.initialize(scopeName = "2", isSearchInScope = true) {}
+			SimplyDIContainer.initialize(scopeName = "1", isSearchInScope = true) {
 				addDependencyNow { AnyClass() }
 			}
-			initializeSimplyDIContainer(
+			SimplyDIContainer.initialize(
 				scopeName = "12345",
 				isSearchInScope = true,
 				simplyLogLevel = SimplyLogLevel.FULL
@@ -125,10 +127,14 @@ class App : Application() {
 				"LAZY(NOT1) GET DEPENDENCY- $it"
 			)
 		}
-
+		val someContainer = SimplyDIContainer("someContainer", false)
+		someContainer.initializeContainer()
+		someContainer.addDependencyLater(clazz = AnyClass::class) { AnyClass() }
 		measureTime {
 			SimplyDIContainer.instance.getDependency<TestLazyClass>("12345")
 		}.let {
+
+
 			println(
 				"LAZY(NOT2) GET DEPENDENCY- $it"
 			)
@@ -189,7 +195,7 @@ class App : Application() {
 		}
 
 		Log.e(TAG, "INITED FOR - $time")
-		container = initializeSimplyDIContainer(CONTAINER_NAME1) {
+		container = SimplyDIContainer.initialize(CONTAINER_NAME1) {
 			addChainScopes(listOfScopes = listOf(CONTAINER_NAME1, CONTAINER_NAME2))
 		}
 	}
@@ -231,7 +237,7 @@ object SomePublicClassFromOtherModule {
 	lateinit var container: SimplyDIContainer
 
 	fun init() {
-		container = initializeSimplyDIContainer(CONTAINER_NAME2) {
+		container = SimplyDIContainer.initialize(CONTAINER_NAME2) {
 			addDependencyLater<SomeStorage> {
 				SomeStorageImpl("secret_shhhhhh...")
 			}
