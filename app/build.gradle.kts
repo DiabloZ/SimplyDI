@@ -66,13 +66,13 @@ dependencies {
 	debugImplementation(libs.androidx.ui.tooling)
 	debugImplementation(libs.androidx.ui.test.manifest)
 
-	implementation(project(":SimplyDICore"))
+/*	implementation(project(":SimplyDICore"))
 	implementation(project(":SimplyDIAndroid"))
 	implementation(project(":SimplyDIViewModel"))
-	implementation(project(":SimplyDICompose"))
+	implementation(project(":SimplyDICompose"))*/
 
-	/*implementation(libs.simply.di.core)*/
-	/*implementation(libs.simply.di.android)*/
-	/*implementation(libs.simply.di.viewmodel)*/
-	/*implementation(libs.simply.di.compose)*/
+	implementation(libs.simply.di.core)
+	implementation(libs.simply.di.android)
+	implementation(libs.simply.di.viewmodel)
+	implementation(libs.simply.di.compose)
 }
