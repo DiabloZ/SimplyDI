@@ -1,0 +1,140 @@
+package su.vi.kdi.core.entry_point
+
+import su.vi.kdi.Lifecycle
+import su.vi.kdi.core.KDIContainer
+import su.vi.kdi.core.error.KDINotFoundException
+import su.vi.kdi.core.lazy.KDILazyWrapper
+import su.vi.kdi.core.utils.KDIConstants.DEFAULT_SCOPE_NAME
+import su.vi.kdi.core.utils.KDILogLevel
+
+/**
+ * DSL to create [KDIContainer]
+ */
+public class KDIContainerDSL {
+	public lateinit var scopeName: String
+	private var isSearchInScope: Boolean = true
+
+	public val mKDIContainer: KDIContainer by lazy {
+		KDIContainer(
+			scopeName = scopeName,
+			isSearchInScope = isSearchInScope
+		)
+	}
+
+	/**
+	 * Initialize method for new container.
+	 * @param scopeName name of the new container.
+	 * @param KDILogLevel where you can set level of logs for you needs for example for release
+	 * would do use [su.vi.simply.di.core.utils.SimplyLogLevel.EMPTY] for debug [su.vi.simply.di.core.utils.SimplyLogLevel.FULL].
+	 * @param isSearchInScope if you want to use this container like data store or you need
+	 * to share dependencies from this container you would set value like true or you can bind them [KDIContainer.addChainScopes].
+	 */
+	internal fun initialize(
+		scopeName: String = DEFAULT_SCOPE_NAME,
+		kdiLogLevel: KDILogLevel = KDILogLevel.Empty,
+		isSearchInScope: Boolean = true,
+		context: KDIContainerDSL.() -> Unit,
+	): KDIContainer {
+		this.scopeName = scopeName
+		mKDIContainer.initializeContainer(
+			scopeName,
+			kdiLogLevel,
+			isSearchInScope
+		)
+		context.invoke(this)
+		return mKDIContainer
+	}
+
+	/**
+	 * Use it to instantly add a dependency.
+	 * @param factory with your dependency.
+	 **/
+	public inline fun <reified T : Any> addDependency(
+		lifecycle: Lifecycle = Lifecycle.SINGLETON,
+		name: String? = null,
+		noinline factory: () -> T,
+	): Unit = mKDIContainer.addDependency<T>(
+		scopeName = scopeName,
+		name = name,
+		lifecycle = lifecycle,
+		clazz = T::class,
+		factory = factory
+	)
+
+	/**
+	 * Use it to instantly add a dependency.
+	 * @param factory with your dependency.
+	 **/
+	public inline fun <reified T : Any> addDependencyAuto(
+		name: String? = null,
+	): Unit = mKDIContainer.addDependencyAuto<T>(
+		scopeName = scopeName,
+		name = name,
+		clazz = T::class,
+	)
+
+
+
+	/**
+	 * Use it to get the dependency.
+	 * @throws KDINotFoundException if the dependency not created you receive.
+	 **/
+	@Throws(KDINotFoundException::class)
+	public inline fun <reified T: Any> getDependency(name: String? = null): T = mKDIContainer.getDependency<T>(
+		scopeName = scopeName,
+		name = name,
+		clazz = T::class
+	)
+
+	/**
+	 * Use it to get the dependency.
+	 * @throws KDINotFoundException if the dependency not created you receive.
+	 **/
+	@Throws(KDINotFoundException::class)
+	public inline fun <reified T : Any> getDependencyByLazy(): KDILazyWrapper<T> =
+		mKDIContainer.getDependencyByLazy(
+			scopeName = scopeName,
+			clazz = T::class
+		)
+
+	/**
+	 * Use it to bind scopes.
+	 * @param listOfScopes List of names of scopes.
+	 **/
+	public fun addChainScopes(listOfScopes: List<String>): Unit = mKDIContainer.addChainScopes(
+		listOfScopes = listOfScopes
+	)
+
+	/**
+	 * Use it to delete bind of scopes.
+	 * @param listOfScopes List of names of scopes.
+	 **/
+	public fun deleteChainedScopes(listOfScopes: List<String>): Unit = mKDIContainer.deleteChainedScopes(
+		listOfScopes = listOfScopes
+	)
+}
+
+/**
+ * Initialize method for new container.
+ * @param scopeName name of the new container.
+ * @param kdiLogLevel where you can set level of logs for you needs for example for release
+ * would do use [kdiLogLevel.EMPTY] for debug [kdiLogLevel.FULL].
+ * @param isSearchInScope if you want to use this container like data store or you need
+ * to share dependencies from this container you would set value like true or you can bind them [KDIContainerDSL.addChainScopes].
+ * @param builder context of [KDIContainerDSL] where you can interact with [KDIContainer] more convenient.
+ */
+public fun KDIContainer.Companion.initialize(
+	scopeName: String = DEFAULT_SCOPE_NAME,
+	kdiLogLevel: KDILogLevel = KDILogLevel.Empty,
+	isSearchInScope: Boolean = true,
+	builder: KDIContainerDSL.() -> Unit,
+): KDIContainer {
+	val containerBuilder = KDIContainerDSL()
+
+	return containerBuilder.initialize(
+		scopeName = scopeName,
+		kdiLogLevel = kdiLogLevel,
+		isSearchInScope = isSearchInScope,
+		context = builder
+	)
+}
