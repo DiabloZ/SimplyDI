@@ -70,10 +70,11 @@ dependencies {
 	//implementation(project(":SimplyDIAndroid"))
 	//implementation(project(":SimplyDIViewModel"))
 	//implementation(project(":SimplyDICompose"))
-	implementation(project(":KDI"))
+	//implementation(project(":KDI"))
 
 	implementation(libs.simply.di.core)
 	implementation(libs.simply.di.android)
 	implementation(libs.simply.di.viewmodel)
 	implementation(libs.simply.di.compose)
+	implementation(libs.kdi.core)
 }
