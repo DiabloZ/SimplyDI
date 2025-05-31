@@ -291,10 +291,12 @@ public fun KDIContainer.initializeContainer(
 	scopeName: String = this.scopeName,
 	kdiLogLevel: KDILogLevel = KDILogLevel.Empty,
 	isSearchInScope: Boolean = this.isSearchInScope,
+	kdiDSL: KDIContainerDSL? = null,
 ) {
 	initialize(
 		scopeName = scopeName,
 		kdiLogLevel = kdiLogLevel,
-		isSearchInScope = isSearchInScope
+		isSearchInScope = isSearchInScope,
+		dslBuilder = kdiDSL
 	)
 }

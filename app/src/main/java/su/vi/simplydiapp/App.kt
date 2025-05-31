@@ -36,12 +36,24 @@ public class App : Application() {
 		kotlin.repeat(10) {
 			tryToUseSimpleDIContainer(this)
 		}
+		println("INITED FOR")
 		kotlin.repeat(10) {
-			toTryUseKDIDSL(this)
+			toTryUseKDI2(this)
 		}
+		println("INITED FOR")
 		kotlin.repeat(10) {
 			toTryUseKDI(this)
 		}
+
+		println("INITED FOR")
+		kotlin.repeat(10) {
+			toTryUseKDIDSL(this)
+		}
+		println("INITED FOR")
+		kotlin.repeat(10) {
+			toTryUseKDIDSL2(this)
+		}
+
 
 	}
 
@@ -54,6 +66,7 @@ public class App : Application() {
 
 private val CONTAINER_NAME1 = "testSomeContainer1"
 private val CONTAINER_NAME2 = "testSomeContainer2"
+private val CONTAINER_NAME3 = "testSomeContainer3"
 
 public interface SomeStorage {
 	fun getSecretString(): String
@@ -133,6 +146,69 @@ private fun toTryUseKDIDSL(app: Application) {
 	Log.e("KDI CONTAINER DSL", "INITED FOR - $time")
 }
 
+private fun toTryUseKDIDSL2(app: Application) {
+	val time = measureTime {
+		val kdiContainer = KDIContainer.initialize(
+			scopeName = CONTAINER_NAME3,
+			isSearchInScope = true,
+		) {
+			addDependency { app }
+			addDependency<ConsoleLogger>() { ConsoleLogger() }
+			addDependency<AuditService>() {
+				AuditService(
+					logger = getDependency(name = "file")
+				)
+			}
+			addDependency<AuditService2>() {
+				AuditService2(
+					logger = getDependency(name = "console")
+				)
+			}
+			addDependency<Logger>(name = "console") { ConsoleLogger() }
+			addDependency<Logger>(name = "file") { FileLogger() }
+			addDependency<A> {
+				Impl1()
+			}
+			addDependency<Impl2>() {
+				Impl2(
+					dep = getDependency<A>()
+				)
+			}
+			addDependency<D>() {
+				Impl3(
+					b = getDependency<B>(),
+					c = getDependency<C>()
+				)
+			}
+			addDependency<B>() { getDependency<Impl2>()}
+			addDependency<C>() { getDependency<Impl2>() }
+			addDependency<E>() { Impl4() }
+			addDependency<AppRunner>() {
+				AppRunner(
+					a = getDependency<A>(),
+					b = getDependency<B>(),
+					c = getDependency<C>(),
+					d = getDependency<D>(),
+					e = getDependency<E>(),
+					logger = getDependency(name = "console")
+				)
+			}
+		}
+		val audit2 = kdiContainer.getDependency<AuditService2>()
+		val audit = kdiContainer.getDependency<AuditService>()
+		audit.logger.log("Audit started.")
+		audit2.logger.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+		val app1 = kdiContainer.getDependency<AppRunner>()
+		val app2 = kdiContainer.getDependency<AppRunner>()
+		val app3 = kdiContainer.getDependency<AppRunner>()
+		val app4 = kdiContainer.getDependency<AppRunner>()
+		val app5 = kdiContainer.getDependency<AppRunner>()
+		val app6 = kdiContainer.getDependency<AppRunner>()
+		app1.run()
+	}
+	Log.e("KDI CONTAINER DSL2", "INITED FOR - $time")
+}
+
 private fun toTryUseKDI(app: Application) {
 	val time = measureTime {
 		val kdiContainer2 = KDIContainer(
@@ -168,6 +244,124 @@ private fun toTryUseKDI(app: Application) {
 		kdiContainer2.addDependencyAuto<Impl3>()
 		kdiContainer2.addDependency<E>() { Impl4() }
 		kdiContainer2.addDependencyAuto<AppRunner>()
+
+		val audit2 = kdiContainer2.getDependency<AuditService2>()
+		val audit = kdiContainer2.getDependency<AuditService>()
+		audit.logger.log("Audit started.")
+		audit2.logger.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+		val app1 = kdiContainer2.getDependency<AppRunner>()
+		val app2 = kdiContainer2.getDependency<AppRunner>()
+		val app3 = kdiContainer2.getDependency<AppRunner>()
+		val app4 = kdiContainer2.getDependency<AppRunner>()
+		val app5 = kdiContainer2.getDependency<AppRunner>()
+		val app6 = kdiContainer2.getDependency<AppRunner>()
+		app1.run()
+	}
+	Log.e("KDI CONTAINER", "INITED FOR - $time")
+/*	val time = measureTime {
+		var container2 = KDIContainerTemp()
+		container2.registerAuto(ConsoleLogger::class.java)
+		container2.registerAuto(AuditService::class.java)
+		container2.registerAuto(AuditService2::class.java)
+		container2.register { app }
+		container2.register(Logger::class.java, name = "console") {
+			ConsoleLogger()
+		}
+
+		container2.register(Logger::class.java, name = "file") {
+			FileLogger()
+		}
+		val audit2 = container2.resolve(AuditService2::class.java)
+		val audit = container2.resolve(AuditService::class.java)
+		audit.logger.log("Audit started.")
+		audit2.logger.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+// Автоматическая регистрация
+		container2.registerAuto<Impl1>()
+		container2.registerAuto<Impl2>()
+		container2.registerAuto<Impl3>()
+		container2.register<E> {
+			Impl4()
+		}
+
+		// Регистрируем точку входа
+		container2.registerAuto<AppRunner>()
+
+		// Запуск
+		val app1 = container2.resolve<AppRunner>()
+		val app2 = container2.resolve<AppRunner>()
+		val app3 = container2.resolve<AppRunner>()
+		val app4 = container2.resolve<AppRunner>()
+		val app5 = container2.resolve<AppRunner>()
+		val app6 = container2.resolve<AppRunner>()
+		app1.run()
+	}
+	Log.e("KDI CONTAINER", "INITED FOR - $time")*/
+}
+
+private fun toTryUseKDI2(app: Application) {
+	val time = measureTime {
+		val kdiContainer2 = KDIContainer(
+			scopeName = CONTAINER_NAME2,
+			isSearchInScope = true,
+		)
+		kdiContainer2.initializeContainer(
+			kdiLogLevel = KDILogLevel.Full(
+				logger = object : su.vi.kdi.core.KDILogger {
+					override fun d(tag: String, text: String, throwable: Throwable?) {
+						Log.d(tag, text, throwable)
+					}
+
+					override fun e(tag: String, text: String, throwable: Throwable?) {
+						Log.e(tag, text, throwable)
+					}
+
+					override fun wtf(tag: String, text: String, throwable: Throwable?) {
+						Log.wtf(tag, text, throwable)
+					}
+				}
+			),
+		)
+		kdiContainer2.addDependency { app }
+		kdiContainer2.addDependency<ConsoleLogger>() { ConsoleLogger() }
+		kdiContainer2.addDependency<AuditService>() {
+			AuditService(
+				logger = kdiContainer2.getDependency(name = "file")
+			)
+		}
+		kdiContainer2.addDependency<AuditService2>() {
+			AuditService2(
+				logger = kdiContainer2.getDependency(name = "console")
+			)
+		}
+		kdiContainer2.addDependency<Logger>(name = "console") { ConsoleLogger() }
+		kdiContainer2.addDependency<Logger>(name = "file") { FileLogger() }
+		kdiContainer2.addDependency<A> {
+			Impl1()
+		}
+		kdiContainer2.addDependency<Impl2>() {
+			Impl2(
+				dep = kdiContainer2.getDependency<A>()
+			)
+		}
+		kdiContainer2.addDependency<D>() {
+			Impl3(
+				b = kdiContainer2.getDependency<B>(),
+				c = kdiContainer2.getDependency<C>()
+			)
+		}
+		kdiContainer2.addDependency<B>() { kdiContainer2.getDependency<Impl2>()}
+		kdiContainer2.addDependency<C>() { kdiContainer2.getDependency<Impl2>() }
+		kdiContainer2.addDependency<E>() { Impl4() }
+		kdiContainer2.addDependency<AppRunner>() {
+			AppRunner(
+				a = kdiContainer2.getDependency<A>(),
+				b = kdiContainer2.getDependency<B>(),
+				c = kdiContainer2.getDependency<C>(),
+				d = kdiContainer2.getDependency<D>(),
+				e = kdiContainer2.getDependency<E>(),
+				logger = kdiContainer2.getDependency(name = "console")
+			)
+		}
 
 		val audit2 = kdiContainer2.getDependency<AuditService2>()
 		val audit = kdiContainer2.getDependency<AuditService>()

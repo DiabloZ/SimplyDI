@@ -6,6 +6,7 @@ import su.vi.kdi.Lifecycle
 import su.vi.kdi.Named
 import su.vi.kdi.Provider
 import su.vi.kdi.SingletonProvider
+import su.vi.kdi.core.entry_point.KDIContainerDSL
 import su.vi.kdi.core.error.KDINotFoundException
 import su.vi.kdi.core.utils.KDIConstants.NOT_FOUND_ERROR
 import java.lang.reflect.Constructor
@@ -19,6 +20,7 @@ import kotlin.reflect.KClass
  */
 internal class KDIScope(
 	internal val isSearchInScope: Boolean,
+	internal val dslBuilder: KDIContainerDSL?,
 ) {
 
 	private val providers: MutableMap<KDIKey, Provider<*>> = mutableMapOf<KDIKey, Provider<*>>()

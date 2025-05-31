@@ -23,4 +23,7 @@ public object KDIConstants {
 		"In the beginning, you need to register such a service - %s with name - %s, before calling it"
 	internal const val REPLACE_ERR =
 		"You try to replace - \"%s\" in scope \"%s\"?\nPls try the methods - \"replaceNow\"|\"replaceLater\"."
+
+	internal const val TRY_TO_RELOAD_CONTAINER =
+		"You try to reload container with name - \"%s\"."
 }

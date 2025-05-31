@@ -13,6 +13,7 @@ import su.vi.kdi.core.utils.KDILogLevel
 public class KDIContainerDSL {
 	public lateinit var scopeName: String
 	private var isSearchInScope: Boolean = true
+	internal lateinit var builder: KDIContainerDSL.() -> Unit
 
 	public val mKDIContainer: KDIContainer by lazy {
 		KDIContainer(
@@ -33,15 +34,16 @@ public class KDIContainerDSL {
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		kdiLogLevel: KDILogLevel = KDILogLevel.Empty,
 		isSearchInScope: Boolean = true,
-		context: KDIContainerDSL.() -> Unit,
+		builder: KDIContainerDSL.() -> Unit,
 	): KDIContainer {
 		this.scopeName = scopeName
 		mKDIContainer.initializeContainer(
-			scopeName,
-			kdiLogLevel,
-			isSearchInScope
+			scopeName = scopeName,
+			kdiLogLevel = kdiLogLevel,
+			isSearchInScope = isSearchInScope,
+			kdiDSL = this
 		)
-		context.invoke(this)
+		this.builder = builder
 		return mKDIContainer
 	}
 
@@ -141,6 +143,6 @@ public fun KDIContainer.Companion.initialize(
 		scopeName = scopeName,
 		kdiLogLevel = kdiLogLevel,
 		isSearchInScope = isSearchInScope,
-		context = builder
+		builder = builder
 	)
 }

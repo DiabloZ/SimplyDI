@@ -1,11 +1,11 @@
 package su.vi.kdi.core
 
 import su.vi.kdi.Lifecycle
+import su.vi.kdi.core.entry_point.KDIContainerDSL
 import su.vi.kdi.core.error.KDINotFoundException
 import su.vi.kdi.core.lazy.KDILazyWrapper
 import su.vi.kdi.core.utils.KDIConstants.CREATE_DEP_LAZY
 import su.vi.kdi.core.utils.KDIConstants.DEFAULT_SCOPE_NAME
-import su.vi.kdi.core.utils.KDIConstants.GET_DEP_FACTORY_NULLABLE
 import su.vi.kdi.core.utils.KDIConstants.GET_DEP_FACTORY_WITH_ERROR
 import su.vi.kdi.core.utils.KDIConstants.GET_DEP_SINGLE
 import su.vi.kdi.core.utils.KDIConstants.LOG_DELETE_CHAIN
@@ -17,6 +17,7 @@ import su.vi.kdi.core.utils.KDIConstants.REPLACE_ERR
 import su.vi.kdi.core.utils.KDIConstants.SCOPE_IS_NOT_INITIALIZED
 import su.vi.kdi.core.utils.KDIConstants.TAG
 import su.vi.kdi.core.utils.KDIConstants.TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED
+import su.vi.kdi.core.utils.KDIConstants.TRY_TO_RELOAD_CONTAINER
 import su.vi.kdi.core.utils.KDILogLevel
 import su.vi.kdi.core.utils.toKDILogger
 import kotlin.reflect.KClass
@@ -34,7 +35,7 @@ public class KDIContainer(
 	 * Initialize method for new container.
 	 * @param scopeName name of the new container.
 	 * @param KDILogLevel where you can set level of logs for you needs for example for release
-	 * would do use [KDILogLevel.EMPTY] for debug [KDILogLevel.FULL].
+	 * would do use [KDILogLevel.Empty] for debug [KDILogLevel.Full].
 	 * @param isSearchInScope if you want to use this container like data store or you need
 	 * to share dependencies from this container you would set value like true or you can bind them [KDIContainer.addChainScopes] .
 	 */
@@ -42,6 +43,7 @@ public class KDIContainer(
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		kdiLogLevel: KDILogLevel = KDILogLevel.Empty,
 		isSearchInScope: Boolean = true,
+		dslBuilder: KDIContainerDSL?,
 	): Unit = synchronized(this) {
 		logger = kdiLogLevel.toKDILogger()
 		when {
@@ -54,7 +56,7 @@ public class KDIContainer(
 				return
 			}
 		}
-		mapContainers[scopeName] = KDIScope(isSearchInScope = isSearchInScope)
+		mapContainers[scopeName] = KDIScope(isSearchInScope = isSearchInScope, dslBuilder = dslBuilder)
 
 		logger.d(TAG, String.format(LOG_INIT, scopeName))
 	}
@@ -133,6 +135,11 @@ public class KDIContainer(
 				scopeName = scopeName,
 				kClass = kClass
 			)
+			?: run {
+				reInitializeScopeAndCallDependency(scopeName = scopeName) {
+					scope.getNullableDependency<T>(clazz = kClass.java, name = name)
+				}
+			}
 			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
 	}
 
@@ -154,6 +161,11 @@ public class KDIContainer(
 				scopeName = scopeName,
 				kClass = kClass
 			)
+			?: run {
+				reInitializeScopeAndCallDependency(scopeName = scopeName) {
+					scope.getNullableDependency<T>(clazz = kClass.java, name = name)
+				}
+			}
 			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
 
 		return KDILazyWrapper(
@@ -172,27 +184,21 @@ public class KDIContainer(
 	): T {
 		logger.d(TAG, "$GET_DEP_FACTORY_WITH_ERROR${kClass}")
 		val scope = mapContainers[scopeName] ?: throw KDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
-		return scope.getNullableDependency(clazz = kClass.java, name = name)
+		return scope.getNullableDependency<T>(clazz = kClass.java, name = name)
 			?: mapContainers.asSequence()
 				.filter { entry -> entry.value.isSearchInScope }
-				.mapNotNull { diScopeEntry -> diScopeEntry.value.getNullableDependency(clazz = kClass.java, name = name) }
+				.mapNotNull { diScopeEntry -> diScopeEntry.value.getNullableDependency<T>(clazz = kClass.java, name = name) }
 				.firstOrNull() as? T
 			?: findInChainScopes(
 				scopeName = scopeName,
 				kClass = kClass
 			)
+			?: run {
+				reInitializeScopeAndCallDependency(scopeName = scopeName){
+					scope.getNullableDependency<T>(clazz = kClass.java, name = name)
+				}
+			}
 			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
-	}
-
-	@Throws(KDINotFoundException::class)
-	internal fun <T : Any> getByClass(
-		scopeName: String = DEFAULT_SCOPE_NAME,
-		name: String? = null,
-		kClass: KClass<T>,
-	): T? {
-		logger.d(TAG, "$GET_DEP_FACTORY_NULLABLE${kClass}")
-		val scope = mapContainers[scopeName] ?: throw KDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
-		return scope.getNullableDependency(clazz = kClass.java, name = name)
 	}
 
 	internal fun addChainScopes(
@@ -225,6 +231,19 @@ public class KDIContainer(
 		listOfScopes.forEach { scopeName ->
 			chainedScopes[scopeName]?.remove(listOfScopes)
 		}
+	}
+
+	private fun <T : Any>  reInitializeScopeAndCallDependency(
+		scopeName: String = DEFAULT_SCOPE_NAME,
+		callDependency: () -> T?,
+	) : T? {
+		val dslBuilder = mapContainers[scopeName]?.dslBuilder
+		if (dslBuilder == null) {
+			return null
+		}
+		logger.d(TAG, "$TRY_TO_RELOAD_CONTAINER${scopeName}")
+		dslBuilder.builder.invoke(dslBuilder)
+		return callDependency.invoke()
 	}
 
 	private fun isDependencyInScope(
