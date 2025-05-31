@@ -12,6 +12,8 @@ import kotlin.reflect.KClass
 /**
  * Use it to add a dependency by lazy.
  * @param scopeName name of your scope.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
+ * @param lifecycle of your dependency, for example [Lifecycle.SINGLETON] or [Lifecycle.FACTORY].
  * @param factory with your dependency.
  **/
 public inline fun <reified T : Any> KDIContainer.addDependency(
@@ -31,6 +33,8 @@ public inline fun <reified T : Any> KDIContainer.addDependency(
  * Use it to add a dependency by lazy.
  * @param scopeName name of your scope.
  * @param clazz KClass of your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
+ * @param lifecycle of your dependency, for example [Lifecycle.SINGLETON] or [Lifecycle.FACTORY].
  * @param factory with your dependency.
  **/
 public fun <T : Any> KDIContainer.addDependency(
@@ -50,6 +54,8 @@ public fun <T : Any> KDIContainer.addDependency(
 /**
  * Use it to add a dependency by lazy.
  * @param clazz KClass of your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
+ * @param lifecycle of your dependency, for example [Lifecycle.SINGLETON] or [Lifecycle.FACTORY].
  * @param factory with your dependency.
  **/
 public fun <T : Any> KDIContainer.addDependency(
@@ -66,9 +72,9 @@ public fun <T : Any> KDIContainer.addDependency(
 )
 
 /**
- * Use it to add a dependency by lazy.
+ * Use it to instantly add a dependency without lambda functions, less weight.
  * @param scopeName name of your scope.
- * @param factory with your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  **/
 public inline fun <reified T : Any> KDIContainer.addDependencyAuto(
 	scopeName: String = this.scopeName,
@@ -80,10 +86,10 @@ public inline fun <reified T : Any> KDIContainer.addDependencyAuto(
 )
 
 /**
- * Use it to add a dependency by lazy.
+ * Use it to instantly add a dependency without lambda functions, less weight.
  * @param scopeName name of your scope.
  * @param clazz KClass of your dependency.
- * @param factory with your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  **/
 public fun <T : Any> KDIContainer.addDependencyAuto(
 	scopeName: String = this.scopeName,
@@ -96,9 +102,9 @@ public fun <T : Any> KDIContainer.addDependencyAuto(
 )
 
 /**
- * Use it to add a dependency by lazy.
+ * Use it to instantly add a dependency without lambda functions, less weight.
  * @param clazz KClass of your dependency.
- * @param factory with your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  **/
 public fun <T : Any> KDIContainer.addDependencyAuto(
 	clazz: KClass<T>,
@@ -113,6 +119,7 @@ public fun <T : Any> KDIContainer.addDependencyAuto(
 /**
  * Use it to get the dependency.
  * @param scopeName name of your scope.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  * @throws KDINotFoundException if the dependency not created you receive.
  **/
 @Throws(KDINotFoundException::class)
@@ -128,6 +135,7 @@ public inline fun <reified T: Any> KDIContainer.getDependency(
 /**
  * Use it to get the dependency.
  * @param scopeName name of your scope.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  * @param clazz KClass of your dependency.
  * @throws KDINotFoundException if the dependency not created you receive.
  **/
@@ -144,6 +152,7 @@ public fun <T: Any> KDIContainer.getDependency(
 /**
  * Use it to get the dependency.
  * @param clazz KClass of your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  * @throws KDINotFoundException if the dependency not created you receive.
  **/
 @Throws(KDINotFoundException::class)
@@ -158,6 +167,7 @@ public fun <T: Any> KDIContainer.getDependency(
 /**
  * Use it to get a dependency from you scope or chained scopes each time new.
  * @param scopeName name of your scope.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  * @throws KDINotFoundException if the dependency not created you receive.
  **/
 @Throws(KDINotFoundException::class)
@@ -174,6 +184,7 @@ public inline fun <reified T: Any> KDIContainer.getByClassAnyway(
  * Use it to get a dependency from you scope or chained scopes each time new.
  * @param scopeName name of your scope.
  * @param clazz KClass of your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  * @throws KDINotFoundException if the dependency not created you receive.
  **/
 @Throws(KDINotFoundException::class)
@@ -190,6 +201,7 @@ public fun <T: Any> KDIContainer.getByClassAnyway(
 /**
  * Use it to get a dependency from you scope or chained scopes each time new.
  * @param clazz KClass of your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  * @throws KDINotFoundException if the dependency not created you receive.
  **/
 @Throws(KDINotFoundException::class)
@@ -205,6 +217,7 @@ public fun <T: Any> KDIContainer.getByClassAnyway(
 /**
  * Use it to get the dependency by lazy.
  * @param scopeName name of your scope.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  * @throws KDINotFoundException if the dependency not created you receive.
  **/
 @Throws(KDINotFoundException::class)
@@ -219,6 +232,7 @@ public inline fun <reified T : Any> KDIContainer.getDependencyByLazy(
 /**
  * Use it to get the dependency by lazy.
  * @param scopeName name of your scope.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  * @param clazz KClass of your dependency.
  * @throws KDINotFoundException if the dependency not created you receive.
  **/
@@ -235,6 +249,7 @@ public fun <T : Any> KDIContainer.getDependencyByLazy(
 
 /**
  * Use it to get the dependency by lazy.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  * @param clazz KClass of your dependency.
  * @throws KDINotFoundException if the dependency not created you receive.
  **/
@@ -267,8 +282,8 @@ public fun KDIContainer.deleteChainedScopes(listOfScopes: List<String>) {
 /**
  * Initialize method for new container.
  * @param scopeName name of the new container.
- * @param KDILogLevel where you can set level of logs for you needs for example for release
- * would do use [su.vi.simply.di.core.utils.SimplyLogLevel.EMPTY] for debug [su.vi.simply.di.core.utils.SimplyLogLevel.FULL].
+ * @param kdiLogLevel where you can set level of logs for you needs for example for release
+ * would do use [KDILogLevel.Empty] for debug [KDILogLevel.Full].
  * @param isSearchInScope if you want to use this container like data store or you need
  * to share dependencies from this container you would set value like true or you can bind them [KDIContainer.addChainScopes] .
  */

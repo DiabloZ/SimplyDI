@@ -24,8 +24,8 @@ public class KDIContainerDSL {
 	/**
 	 * Initialize method for new container.
 	 * @param scopeName name of the new container.
-	 * @param KDILogLevel where you can set level of logs for you needs for example for release
-	 * would do use [su.vi.simply.di.core.utils.SimplyLogLevel.EMPTY] for debug [su.vi.simply.di.core.utils.SimplyLogLevel.FULL].
+	 * @param kdiLogLevel where you can set level of logs for you needs for example for release
+	 * would do use [su.vi.kdi.core.utils.KDILogLevel.Empty] for debug [su.vi.kdi.core.utils.KDILogLevel.Full].
 	 * @param isSearchInScope if you want to use this container like data store or you need
 	 * to share dependencies from this container you would set value like true or you can bind them [KDIContainer.addChainScopes].
 	 */
@@ -47,6 +47,8 @@ public class KDIContainerDSL {
 
 	/**
 	 * Use it to instantly add a dependency.
+	 * @param lifecycle of your dependency, for example [Lifecycle.SINGLETON] or [Lifecycle.FACTORY].
+	 * @param name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
 	 * @param factory with your dependency.
 	 **/
 	public inline fun <reified T : Any> addDependency(
@@ -62,8 +64,8 @@ public class KDIContainerDSL {
 	)
 
 	/**
-	 * Use it to instantly add a dependency.
-	 * @param factory with your dependency.
+	 * Use it to instantly add a dependency without lambda functions, less weight.
+	 * @param name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
 	 **/
 	public inline fun <reified T : Any> addDependencyAuto(
 		name: String? = null,
@@ -77,6 +79,7 @@ public class KDIContainerDSL {
 
 	/**
 	 * Use it to get the dependency.
+	 * @param name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
 	 * @throws KDINotFoundException if the dependency not created you receive.
 	 **/
 	@Throws(KDINotFoundException::class)
@@ -88,10 +91,13 @@ public class KDIContainerDSL {
 
 	/**
 	 * Use it to get the dependency.
+	 * @param name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
 	 * @throws KDINotFoundException if the dependency not created you receive.
 	 **/
 	@Throws(KDINotFoundException::class)
-	public inline fun <reified T : Any> getDependencyByLazy(): KDILazyWrapper<T> =
+	public inline fun <reified T : Any> getDependencyByLazy(
+		name: String? = null
+	): KDILazyWrapper<T> =
 		mKDIContainer.getDependencyByLazy(
 			scopeName = scopeName,
 			clazz = T::class
@@ -118,7 +124,7 @@ public class KDIContainerDSL {
  * Initialize method for new container.
  * @param scopeName name of the new container.
  * @param kdiLogLevel where you can set level of logs for you needs for example for release
- * would do use [kdiLogLevel.EMPTY] for debug [kdiLogLevel.FULL].
+ * would do use [KDILogLevel.Empty] for debug [KDILogLevel.Full].
  * @param isSearchInScope if you want to use this container like data store or you need
  * to share dependencies from this container you would set value like true or you can bind them [KDIContainerDSL.addChainScopes].
  * @param builder context of [KDIContainerDSL] where you can interact with [KDIContainer] more convenient.

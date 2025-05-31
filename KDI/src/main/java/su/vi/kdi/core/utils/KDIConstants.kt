@@ -15,12 +15,8 @@ public object KDIConstants {
 		"|||||||||||||||| !!!WARNING scope by default is \"$DEFAULT_SCOPE_NAME\"!!! ||||||||||||||||"
 	internal const val TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED =
 		"You try to create dependency !!!\"%s\"!!! in to scope with name !!!\"%s\"!!! but it's not created."
-	internal const val CREATE_DEP_IMMEDIATELY = "Added dependency by now - "
 	internal const val CREATE_DEP_LAZY = "Added dependency by lazy - "
-	internal const val DELETE_DEP = "Deleted dependency - "
-	internal const val DELETE_DEP_ERR = "You try to delete dependency in not created scope"
 	internal const val GET_DEP_SINGLE = "Call dependency with add to container - "
-	internal const val GET_DEP_FACTORY = "Call dependency without add to container - "
 	internal const val GET_DEP_FACTORY_WITH_ERROR = "Call dependency without add to container with error - "
 	internal const val GET_DEP_FACTORY_NULLABLE = "Call dependency without add to container with nullable - "
 	internal const val NOT_FOUND_ERROR =
