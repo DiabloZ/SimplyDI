@@ -146,6 +146,7 @@ public fun <T: Any> KDIContainer.getDependency(
 	clazz: KClass<T>,
 ): T = getDependency(
 	scopeName = scopeName,
+	name = name,
 	kClass = clazz
 )
 
@@ -161,6 +162,7 @@ public fun <T: Any> KDIContainer.getDependency(
 	name: String? = null,
 ): T = getDependency<T>(
 	scopeName = scopeName,
+	name = name,
 	kClass = clazz
 )
 
@@ -226,6 +228,7 @@ public inline fun <reified T : Any> KDIContainer.getDependencyByLazy(
 	name: String? = null,
 ): KDILazyWrapper<T> = getDependencyByLazy<T>(
 	scopeName = scopeName,
+	name = name,
 	clazz = T::class,
 )
 

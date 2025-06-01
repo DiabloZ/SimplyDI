@@ -140,7 +140,7 @@ public class KDIContainer(
 					scope.getNullableDependency<T>(clazz = kClass.java, name = name)
 				}
 			}
-			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
+			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass, name))
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class KDIContainer(
 					scope.getNullableDependency<T>(clazz = kClass.java, name = name)
 				}
 			}
-			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
+			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass, name))
 
 		return KDILazyWrapper(
 			lazyValue = {
@@ -203,7 +203,7 @@ public class KDIContainer(
 					scope.getNullableDependency<T>(clazz = kClass.java, name = name)
 				}
 			}
-			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
+			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass, name))
 	}
 
 	internal fun addChainScopes(
