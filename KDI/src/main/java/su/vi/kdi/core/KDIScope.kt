@@ -23,6 +23,8 @@ internal class KDIScope(
 	internal val dslBuilder: KDIContainerDSL?,
 ) {
 
+	internal var isInitialized: Boolean = false
+
 	private val providers: MutableMap<KDIKey, Provider<*>> = mutableMapOf<KDIKey, Provider<*>>()
 	private val resolving: ThreadLocal<MutableSet<KDIKey>> = object : ThreadLocal<MutableSet<KDIKey>>() {
 		override fun initialValue(): MutableSet<KDIKey> = mutableSetOf()

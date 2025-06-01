@@ -187,14 +187,19 @@ public class KDIContainer(
 		return scope.getNullableDependency<T>(clazz = kClass.java, name = name)
 			?: mapContainers.asSequence()
 				.filter { entry -> entry.value.isSearchInScope }
-				.mapNotNull { diScopeEntry -> diScopeEntry.value.getNullableDependency<T>(clazz = kClass.java, name = name) }
+				.mapNotNull { diScopeEntry ->
+					diScopeEntry.value.getNullableDependency<T>(
+						clazz = kClass.java,
+						name = name
+					)
+				}
 				.firstOrNull() as? T
 			?: findInChainScopes(
 				scopeName = scopeName,
 				kClass = kClass
 			)
 			?: run {
-				reInitializeScopeAndCallDependency(scopeName = scopeName){
+				reInitializeScopeAndCallDependency(scopeName = scopeName) {
 					scope.getNullableDependency<T>(clazz = kClass.java, name = name)
 				}
 			}
@@ -233,16 +238,20 @@ public class KDIContainer(
 		}
 	}
 
-	private fun <T : Any>  reInitializeScopeAndCallDependency(
+	private fun <T : Any> reInitializeScopeAndCallDependency(
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		callDependency: () -> T?,
-	) : T? {
-		val dslBuilder = mapContainers[scopeName]?.dslBuilder
-		if (dslBuilder == null) {
-			return null
+	): T? {
+		val container = mapContainers[scopeName]
+		if (container != null && !container.isInitialized) {
+			container.isInitialized = true
+			val dslBuilder = container.dslBuilder
+			if (dslBuilder == null) {
+				return null
+			}
+			logger.d(TAG, "$TRY_TO_RELOAD_CONTAINER${scopeName}")
+			dslBuilder.builder.invoke(dslBuilder)
 		}
-		logger.d(TAG, "$TRY_TO_RELOAD_CONTAINER${scopeName}")
-		dslBuilder.builder.invoke(dslBuilder)
 		return callDependency.invoke()
 	}
 
@@ -260,9 +269,11 @@ public class KDIContainer(
 		chainedScopes[scopeName]?.forEach { chainedScopes ->
 			chainedScopes.forEach { chainedName ->
 				if (scopeName != chainedName) {
-					mapContainers[chainedName]?.getNullableDependency<T>(clazz = kClass.java, name = name)?.let { dependency ->
-						return dependency
-					}
+					val container = mapContainers[chainedName]
+					return container?.getNullableDependency<T>(clazz = kClass.java, name = name)
+						?: reInitializeScopeAndCallDependency(scopeName = scopeName) {
+							container?.getNullableDependency<T>(clazz = kClass.java, name = name)
+						}
 				}
 			}
 		}
