@@ -20,8 +20,9 @@ nameSpaceApp = "su.vi.simplydiapp"
 nameSpaceSDK = "su.vi.simplydi"
 vanniktechMavenPublish = "0.30.0"
 commonVersion = "1.0.7"
-commonKDIVersion = "1.0.1"
+commonKDIVersion = "1.0.2"
 jetbrainsKotlinJvm = "1.9.22"
+materialVersion = "1.12.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +47,7 @@ simply-di-android = { module = "io.github.diabloz:simply-di-android", version.re
 simply-di-compose = { module = "io.github.diabloz:simply-di-compose", version.ref = "commonVersion" }
 simply-di-core = { module = "io.github.diabloz:simply-di-core", version.ref = "commonVersion" }
 simply-di-viewmodel = { module = "io.github.diabloz:simply-di-viewmodel", version.ref = "commonVersion" }
+material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

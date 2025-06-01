@@ -54,6 +54,9 @@ public class App : Application() {
 			toTryUseKDIDSL2(this)
 		}
 
+		container3 = KDIContainer.initialize(CONTAINER_NAME10) {
+			addChainScopes(listOfScopes = listOf(CONTAINER_NAME10, CONTAINER_NAME20))
+		}
 
 	}
 
@@ -61,9 +64,12 @@ public class App : Application() {
 		internal const val TAG = "SIMPLY DI CONTAINER"
 		internal lateinit var container: SimplyDIContainer
 		internal lateinit var container2: SimplyDIContainer
+		internal lateinit var container3: KDIContainer
 	}
 }
 
+private val CONTAINER_NAME10 = "testSomeContainer10"
+private val CONTAINER_NAME20 = "testSomeContainer20"
 private val CONTAINER_NAME1 = "testSomeContainer1"
 private val CONTAINER_NAME2 = "testSomeContainer2"
 private val CONTAINER_NAME3 = "testSomeContainer3"
@@ -328,13 +334,13 @@ private fun toTryUseKDI2(app: Application) {
 				logger = kdiContainer2.getDependency(name = "file")
 			)
 		}
+		kdiContainer2.addDependency<Logger>(name = "console") { ConsoleLogger() }
+		kdiContainer2.addDependency<Logger>(name = "file") { FileLogger() }
 		kdiContainer2.addDependency<AuditService2>() {
 			AuditService2(
 				logger = kdiContainer2.getDependency(name = "console")
 			)
 		}
-		kdiContainer2.addDependency<Logger>(name = "console") { ConsoleLogger() }
-		kdiContainer2.addDependency<Logger>(name = "file") { FileLogger() }
 		kdiContainer2.addDependency<A> {
 			Impl1()
 		}
@@ -616,7 +622,7 @@ class AuditService @Inject constructor(
 )
 
 class AuditService2(
-	val logger: ConsoleLogger,
+	val logger: Logger,
 )
 
 interface A {

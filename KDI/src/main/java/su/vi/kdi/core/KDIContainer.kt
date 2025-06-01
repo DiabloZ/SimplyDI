@@ -131,15 +131,14 @@ public class KDIContainer(
 		logger.d(TAG, "$GET_DEP_SINGLE${kClass}")
 		val scope = mapContainers[scopeName] ?: throw KDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
 		return scope.getNullableDependency<T>(clazz = kClass.java, name = name)
+			?: reInitializeScopeAndCallDependency(scopeName = scopeName) {
+				scope.getNullableDependency<T>(clazz = kClass.java, name = name)
+			}
 			?: findInChainScopes(
 				scopeName = scopeName,
 				kClass = kClass
 			)
-			?: run {
-				reInitializeScopeAndCallDependency(scopeName = scopeName) {
-					scope.getNullableDependency<T>(clazz = kClass.java, name = name)
-				}
-			}
+
 			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass, name))
 	}
 
@@ -157,15 +156,13 @@ public class KDIContainer(
 		logger.d(TAG, "$GET_DEP_SINGLE${kClass}")
 		val scope = mapContainers[scopeName] ?: throw KDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
 		val dependency = scope.getNullableDependency<T>(clazz = kClass.java, name = name)
+			?: reInitializeScopeAndCallDependency(scopeName = scopeName) {
+				scope.getNullableDependency<T>(clazz = kClass.java, name = name)
+			}
 			?: findInChainScopes(
 				scopeName = scopeName,
 				kClass = kClass
 			)
-			?: run {
-				reInitializeScopeAndCallDependency(scopeName = scopeName) {
-					scope.getNullableDependency<T>(clazz = kClass.java, name = name)
-				}
-			}
 			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass, name))
 
 		return KDILazyWrapper(
@@ -194,15 +191,13 @@ public class KDIContainer(
 					)
 				}
 				.firstOrNull() as? T
+			?: reInitializeScopeAndCallDependency(scopeName = scopeName) {
+				scope.getNullableDependency<T>(clazz = kClass.java, name = name)
+			}
 			?: findInChainScopes(
 				scopeName = scopeName,
 				kClass = kClass
 			)
-			?: run {
-				reInitializeScopeAndCallDependency(scopeName = scopeName) {
-					scope.getNullableDependency<T>(clazz = kClass.java, name = name)
-				}
-			}
 			?: throw KDINotFoundException(String.format(NOT_FOUND_ERROR, kClass, name))
 	}
 
@@ -251,6 +246,8 @@ public class KDIContainer(
 			}
 			logger.d(TAG, "$TRY_TO_RELOAD_CONTAINER${scopeName}")
 			dslBuilder.builder.invoke(dslBuilder)
+		} else {
+			return null
 		}
 		return callDependency.invoke()
 	}
@@ -270,10 +267,13 @@ public class KDIContainer(
 			chainedScopes.forEach { chainedName ->
 				if (scopeName != chainedName) {
 					val container = mapContainers[chainedName]
-					return container?.getNullableDependency<T>(clazz = kClass.java, name = name)
-						?: reInitializeScopeAndCallDependency(scopeName = scopeName) {
+					val dependency = container?.getNullableDependency<T>(clazz = kClass.java, name = name)
+						?: reInitializeScopeAndCallDependency(scopeName = chainedName) {
 							container?.getNullableDependency<T>(clazz = kClass.java, name = name)
 						}
+					if (dependency != null) {
+						return dependency
+					}
 				}
 			}
 		}

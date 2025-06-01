@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import su.vi.kdi.core.entry_point.getDependency
 import su.vi.simply.di.android.simplyAndroidViewModel
 import su.vi.simply.di.compose.simplyComposeViewModel
 import su.vi.simply.di.core.SimplyDIContainer
@@ -24,6 +25,8 @@ import su.vi.simply.di.core.entry_point.getDependencyByLazy
 import su.vi.simply.di.core.entry_point.initializeContainer
 import su.vi.simplydiapp.for_test.AnyClass
 import su.vi.simplydiapp.ui.theme.SimplyDITheme
+import su.vi.sometestmodule.SomePublicClassFromOtherModule222
+import su.vi.sometestmodule.SomeStorage2
 
 class MainActivity : ComponentActivity() {
 	private val asdas by simplyAndroidViewModel<AnyClass>(key = "123")
@@ -32,6 +35,9 @@ class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		SomePublicClassFromOtherModule.init()
 		SomePublicClassFromOtherModule.getOther()
+
+		testOtherModule()
+
 		SimplyDIContainer("testSomeContainer2", false).initializeContainer(
 			simplyLogLevel = SimplyLogLevel.FULL,
 		)
@@ -126,6 +132,19 @@ class MainActivity : ComponentActivity() {
 				}
 			}
 		}
+	}
+
+	private fun testOtherModule() {
+
+		SomePublicClassFromOtherModule222.init()
+		val someStorage = App.container3.getDependency<SomeStorage2>()
+		val someStorage2 = App.container3.getDependency<SomeStorage2>()
+		val someStorage3 = App.container3.getDependency<SomeStorage2>()
+
+		App.container3.getDependency<SomeStorage2>(clazz = SomeStorage2::class)
+		println(someStorage)
+		println(someStorage2)
+		println(someStorage3)
 	}
 }
 
