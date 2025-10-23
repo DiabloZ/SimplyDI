@@ -27,7 +27,7 @@ internal class KDIScope(
 
 	private val providers: MutableMap<KDIKey, Provider<*>> = mutableMapOf<KDIKey, Provider<*>>()
 	private val resolving: ThreadLocal<MutableSet<KDIKey>> = object : ThreadLocal<MutableSet<KDIKey>>() {
-		override fun initialValue(): MutableSet<KDIKey> = mutableSetOf()
+		override fun initialValue(): MutableSet<KDIKey> = linkedSetOf()
 	}
 
 	/**
@@ -85,8 +85,13 @@ internal class KDIScope(
 
 		val provider = SingletonProvider {
 			val key = KDIKey(clazz, name)
-			if (!resolving.get().add(key)) {
-				error("Cyclic dependency detected involving ${clazz.name}")
+
+			val currentResolving = resolving.get()
+			if (!currentResolving.add(key)) {
+				val dependencyPath = mutableListOf<String>()
+				currentResolving.forEach { dependencyPath.add(it.type.name) }
+				val cyclePath = (dependencyPath + clazz.name).joinToString(" -> ")
+				error("Cyclic dependency detected involving ${clazz.name}. Path: $cyclePath")
 			}
 
 			val args = paramTypes.indices.map { i ->
