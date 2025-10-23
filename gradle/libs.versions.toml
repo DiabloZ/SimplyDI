@@ -20,7 +20,7 @@ nameSpaceApp = "su.vi.simplydiapp"
 nameSpaceSDK = "su.vi.simplydi"
 vanniktechMavenPublish = "0.30.0"
 commonVersion = "1.0.7"
-commonKDIVersion = "1.0.4"
+commonKDIVersion = "1.0.5"
 jetbrainsKotlinJvm = "1.9.22"
 materialVersion = "1.12.0"
 
