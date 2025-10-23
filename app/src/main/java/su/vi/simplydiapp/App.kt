@@ -237,6 +237,7 @@ private fun toTryUseKDIDSL3(app: Application) {
             addDependencyManually<Impl1>(supertypes = listOf(A::class, B::class))
             addDependencyManually<Impl2>(supertypes = listOf(B::class, C::class))
             addDependencyAuto<Impl3>()
+            addDependencyLambdaAuto<Impl3>()
             addDependency<E>() { Impl4() }
             addDependencyAuto<AppRunner>()
         }

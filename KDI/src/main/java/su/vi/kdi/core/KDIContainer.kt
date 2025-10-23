@@ -97,6 +97,32 @@ public class KDIContainer(
 	 * @throws KDINotFoundException if dependency is not found
 	 **/
 	@Throws(KDINotFoundException::class)
+	internal fun <T : Any> addDependencyLambdaAuto(
+		scopeName: String = DEFAULT_SCOPE_NAME,
+		name: String? = null,
+		kClass: KClass<T>,
+	): Unit = synchronized(this) {
+		if (isDependencyInScope(scopeName = scopeName, kClass = kClass)) {
+			logger.e(TAG, String.format(REPLACE_ERR, kClass, scopeName))
+			return@synchronized
+		}
+		mapContainers[scopeName]?.createDependencyLambdaAuto<T>(
+			clazz = kClass.java,
+			name = name,
+		) ?: kotlin.run {
+			throw KDINotFoundException(
+				String.format(TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED, kClass, scopeName)
+			)
+		}
+		logger.d(TAG, "$CREATE_DEP_LAZY${kClass}")
+	}
+
+	/**
+	 * Method for getting a dependency from [KDIScope].
+	 * @return T
+	 * @throws KDINotFoundException if dependency is not found
+	 **/
+	@Throws(KDINotFoundException::class)
 	internal fun <T : Any> addDependencyAuto(
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		name: String? = null,

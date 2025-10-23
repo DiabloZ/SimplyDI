@@ -76,6 +76,50 @@ public fun <T : Any> KDIContainer.addDependency(
  * @param scopeName name of your scope.
  * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  **/
+public inline fun <reified T : Any> KDIContainer.addDependencyLambdaAuto(
+	scopeName: String = this.scopeName,
+	name: String? = null,
+): Unit = addDependencyLambdaAuto(
+	scopeName = scopeName,
+	clazz = T::class,
+	name = name,
+)
+
+/**
+ * Use it to instantly add a dependency without lambda functions, less weight.
+ * @param scopeName name of your scope.
+ * @param clazz KClass of your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
+ **/
+public fun <T : Any> KDIContainer.addDependencyLambdaAuto(
+	scopeName: String = this.scopeName,
+	clazz: KClass<T>,
+	name: String? = null,
+): Unit = addDependencyLambdaAuto(
+	scopeName = scopeName,
+	kClass = clazz,
+	name = name,
+)
+
+/**
+ * Use it to instantly add a dependency without lambda functions, less weight.
+ * @param clazz KClass of your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
+ **/
+public fun <T : Any> KDIContainer.addDependencyLambdaAuto(
+	clazz: KClass<T>,
+	name: String? = null,
+): Unit = addDependencyLambdaAuto(
+	scopeName = scopeName,
+	kClass = clazz,
+	name = name,
+)
+
+/**
+ * Use it to instantly add a dependency without lambda functions, less weight.
+ * @param scopeName name of your scope.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
+ **/
 public inline fun <reified T : Any> KDIContainer.addDependencyAuto(
 	scopeName: String = this.scopeName,
 	name: String? = null,

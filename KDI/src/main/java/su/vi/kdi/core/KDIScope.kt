@@ -78,6 +78,42 @@ internal class KDIScope(
 	}
 
 	@Suppress("UNCHECKED_CAST")
+	internal fun <T : Any> createDependencyLambdaAuto(
+		clazz: Class<T>,
+		name: String? = null,
+		lifecycle: Lifecycle = Lifecycle.SINGLETON,
+	) {
+		val constructor = selectConstructor(clazz)
+		val paramTypes = constructor.parameterTypes
+		val annotations = constructor.parameterAnnotations
+
+		createDependency<T>(
+			type = clazz,
+			name = name,
+			lifecycle = lifecycle,
+			factory = {
+				val key = KDIKey(clazz, name)
+
+				val currentResolving = resolving.get()
+				if (!currentResolving.add(key)) {
+					val dependencyPath = mutableListOf<String>()
+					currentResolving.forEach { dependencyPath.add(it.type.name) }
+					val cyclePath = (dependencyPath + clazz.name).joinToString(" -> ")
+					error("Cyclic dependency detected involving ${clazz.name}. Path: $cyclePath")
+				}
+
+				val args = paramTypes.indices.map { i ->
+					val paramName = annotations[i].filterIsInstance<Named>().firstOrNull()?.value
+					getDependency(paramTypes[i], paramName)
+				}
+
+				resolving.get().remove(key)
+				constructor.newInstance(*args.toTypedArray()) as T
+			}
+		)
+	}
+
+	@Suppress("UNCHECKED_CAST")
 	internal fun <T : Any> createDependencyAuto(clazz: Class<T>, name: String? = null) {
 		val constructor = selectConstructor(clazz)
 		val paramTypes = constructor.parameterTypes

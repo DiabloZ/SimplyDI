@@ -70,6 +70,18 @@ public class KDIContainerDSL {
 	 * Use it to instantly add a dependency without lambda functions, less weight.
 	 * @param name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
 	 **/
+	public inline fun <reified T : Any> addDependencyLambdaAuto(
+		name: String? = null,
+	): Unit = mKDIContainer.addDependencyLambdaAuto<T>(
+		scopeName = scopeName,
+		name = name,
+		clazz = T::class,
+	)
+
+	/**
+	 * Use it to instantly add a dependency without lambda functions, less weight.
+	 * @param name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
+	 **/
 	public inline fun <reified T : Any> addDependencyAuto(
 		name: String? = null,
 	): Unit = mKDIContainer.addDependencyAuto<T>(
