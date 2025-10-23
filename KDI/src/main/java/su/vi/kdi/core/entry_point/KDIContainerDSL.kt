@@ -70,6 +70,7 @@ public class KDIContainerDSL {
 	 * Use it to instantly add a dependency without lambda functions, less weight.
 	 * @param name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
 	 **/
+	@Deprecated("This is an experimental API and is not recommended for use.")
 	public inline fun <reified T : Any> addDependencyLambdaAuto(
 		name: String? = null,
 	): Unit = mKDIContainer.addDependencyLambdaAuto<T>(
@@ -94,6 +95,7 @@ public class KDIContainerDSL {
 	 * Use it to instantly add a dependency without lambda functions, less weight.
 	 * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
 	 **/
+	@Deprecated("This is an experimental API and is not recommended for use.")
 	public inline fun <reified T : Any> addDependencyManually(
 		name: String? = null,
 		supertypes: List<KClass<*>>,

@@ -96,6 +96,7 @@ public class KDIContainer(
 	 * @return T
 	 * @throws KDINotFoundException if dependency is not found
 	 **/
+	@Deprecated("This is an experimental API and is not recommended for use.")
 	@Throws(KDINotFoundException::class)
 	internal fun <T : Any> addDependencyLambdaAuto(
 		scopeName: String = DEFAULT_SCOPE_NAME,
@@ -148,6 +149,7 @@ public class KDIContainer(
 	 * @return T
 	 * @throws KDINotFoundException if dependency is not found
 	 **/
+	@Deprecated("This is an experimental API and is not recommended for use.")
 	@Throws(KDINotFoundException::class)
 	internal fun <T : Any> addDependencyManually(
 		scopeName: String = DEFAULT_SCOPE_NAME,

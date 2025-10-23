@@ -76,6 +76,7 @@ public fun <T : Any> KDIContainer.addDependency(
  * @param scopeName name of your scope.
  * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  **/
+@Deprecated("This is an experimental API and is not recommended for use.")
 public inline fun <reified T : Any> KDIContainer.addDependencyLambdaAuto(
 	scopeName: String = this.scopeName,
 	name: String? = null,
@@ -91,6 +92,7 @@ public inline fun <reified T : Any> KDIContainer.addDependencyLambdaAuto(
  * @param clazz KClass of your dependency.
  * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  **/
+@Deprecated("This is an experimental API and is not recommended for use.")
 public fun <T : Any> KDIContainer.addDependencyLambdaAuto(
 	scopeName: String = this.scopeName,
 	clazz: KClass<T>,
@@ -106,6 +108,7 @@ public fun <T : Any> KDIContainer.addDependencyLambdaAuto(
  * @param clazz KClass of your dependency.
  * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  **/
+@Deprecated("This is an experimental API and is not recommended for use.")
 public fun <T : Any> KDIContainer.addDependencyLambdaAuto(
 	clazz: KClass<T>,
 	name: String? = null,
@@ -165,6 +168,7 @@ public fun <T : Any> KDIContainer.addDependencyAuto(
  * @param scopeName name of your scope.
  * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  **/
+@Deprecated("This is an experimental API and is not recommended for use.")
 public inline fun <reified T : Any> KDIContainer.addDependencyManually(
     scopeName: String = this.scopeName,
     name: String? = null,
@@ -182,6 +186,7 @@ public inline fun <reified T : Any> KDIContainer.addDependencyManually(
  * @param clazz KClass of your dependency.
  * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  **/
+@Deprecated("This is an experimental API and is not recommended for use.")
 public fun <T : Any> KDIContainer.addDependencyManually(
     scopeName: String = this.scopeName,
     clazz: KClass<T>,
@@ -199,6 +204,7 @@ public fun <T : Any> KDIContainer.addDependencyManually(
  * @param clazz KClass of your dependency.
  * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
  **/
+@Deprecated("This is an experimental API and is not recommended for use.")
 public fun <T : Any> KDIContainer.addDependencyManually(
     clazz: KClass<T>,
     name: String? = null,
