@@ -117,6 +117,57 @@ public fun <T : Any> KDIContainer.addDependencyAuto(
 
 
 /**
+ * Use it to instantly add a dependency without lambda functions, less weight.
+ * @param scopeName name of your scope.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
+ **/
+public inline fun <reified T : Any> KDIContainer.addDependencyManually(
+    scopeName: String = this.scopeName,
+    name: String? = null,
+    supertypes: List<KClass<*>>,
+): Unit = addDependencyManually(
+    scopeName = scopeName,
+    clazz = T::class,
+    name = name,
+    supertypes = supertypes
+)
+
+/**
+ * Use it to instantly add a dependency without lambda functions, less weight.
+ * @param scopeName name of your scope.
+ * @param clazz KClass of your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
+ **/
+public fun <T : Any> KDIContainer.addDependencyManually(
+    scopeName: String = this.scopeName,
+    clazz: KClass<T>,
+    name: String? = null,
+    supertypes: List<KClass<*>>,
+): Unit = addDependencyManually(
+    scopeName = scopeName,
+    kClass = clazz,
+    name = name,
+    supertypes = supertypes
+)
+
+/**
+ * Use it to instantly add a dependency without lambda functions, less weight.
+ * @param clazz KClass of your dependency.
+ * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
+ **/
+public fun <T : Any> KDIContainer.addDependencyManually(
+    clazz: KClass<T>,
+    name: String? = null,
+    supertypes: List<KClass<*>>,
+): Unit = addDependencyManually(
+    scopeName = scopeName,
+    kClass = clazz,
+    name = name,
+    supertypes = supertypes
+)
+
+
+/**
  * Use it to get the dependency.
  * @param scopeName name of your scope.
  * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.

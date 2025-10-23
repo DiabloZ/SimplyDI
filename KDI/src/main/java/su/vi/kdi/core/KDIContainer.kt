@@ -118,6 +118,34 @@ public class KDIContainer(
 	}
 
 	/**
+	 * Method for getting a dependency from [KDIScope].
+	 * @return T
+	 * @throws KDINotFoundException if dependency is not found
+	 **/
+	@Throws(KDINotFoundException::class)
+	internal fun <T : Any> addDependencyManually(
+		scopeName: String = DEFAULT_SCOPE_NAME,
+		name: String? = null,
+		kClass: KClass<T>,
+		supertypes: List<KClass<*>>,
+	): Unit = synchronized(this) {
+		if (isDependencyInScope(scopeName = scopeName, kClass = kClass)) {
+			logger.e(TAG, String.format(REPLACE_ERR, kClass, scopeName))
+			return@synchronized
+		}
+		mapContainers[scopeName]?.createDependencyManually<T>(
+			clazz = kClass.java,
+			name = name,
+			supertypes = supertypes.map { it.java }
+		) ?: kotlin.run {
+			throw KDINotFoundException(
+				String.format(TRY_TO_CREATE_DEP_WHEN_SCOPE_IS_NOT_CREATED, kClass, scopeName)
+			)
+		}
+		logger.d(TAG, "$CREATE_DEP_LAZY${kClass}")
+	}
+
+	/**
 	 * A method for getting a dependency from [KDIScope].
 	 * @return T
 	 * @throws KDINotFoundException if the dependency is not found when added to the container

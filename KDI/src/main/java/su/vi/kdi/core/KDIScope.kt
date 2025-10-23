@@ -110,6 +110,38 @@ internal class KDIScope(
 		}
 	}
 
+	@Suppress("UNCHECKED_CAST")
+	internal fun <T : Any> createDependencyManually(clazz: Class<T>, name: String? = null, supertypes: List<Class<*>>) {
+		val constructor = selectConstructor(clazz)
+		val paramTypes = constructor.parameterTypes
+		val annotations = constructor.parameterAnnotations
+
+		val provider = SingletonProvider {
+			val key = KDIKey(clazz, name)
+
+			val currentResolving = resolving.get()
+			if (!currentResolving.add(key)) {
+				val dependencyPath = mutableListOf<String>()
+				currentResolving.forEach { dependencyPath.add(it.type.name) }
+				val cyclePath = (dependencyPath + clazz.name).joinToString(" -> ")
+				error("Cyclic dependency detected involving ${clazz.name}. Path: $cyclePath")
+			}
+
+			val args = paramTypes.indices.map { i ->
+				val paramName = annotations[i].filterIsInstance<Named>().firstOrNull()?.value
+				getDependency(paramTypes[i], paramName)
+			}
+
+			resolving.get().remove(key)
+			constructor.newInstance(*args.toTypedArray()) as? T
+		}
+
+		for (supertype in supertypes) {
+			val key = KDIKey(supertype, name)
+			providers[key] = provider
+		}
+	}
+
 	private fun getAllSupertypes(type: Class<*>): Set<Class<*>> {
 		val result = mutableSetOf<Class<*>>()
 		val queue = ArrayDeque<Class<*>>()

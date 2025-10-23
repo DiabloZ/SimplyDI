@@ -6,6 +6,7 @@ import su.vi.kdi.core.error.KDINotFoundException
 import su.vi.kdi.core.lazy.KDILazyWrapper
 import su.vi.kdi.core.utils.KDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.kdi.core.utils.KDILogLevel
+import kotlin.reflect.KClass
 
 /**
  * DSL to create [KDIContainer]
@@ -75,6 +76,20 @@ public class KDIContainerDSL {
 		scopeName = scopeName,
 		name = name,
 		clazz = T::class,
+	)
+
+	/**
+	 * Use it to instantly add a dependency without lambda functions, less weight.
+	 * @param name name of your dependency, if you want to use it like [KDIContainer.getDependency] with name.
+	 **/
+	public inline fun <reified T : Any> addDependencyManually(
+		name: String? = null,
+		supertypes: List<KClass<*>>,
+	): Unit = mKDIContainer.addDependencyManually<T>(
+		scopeName = scopeName,
+		name = name,
+		clazz = T::class,
+		supertypes = supertypes
 	)
 
 

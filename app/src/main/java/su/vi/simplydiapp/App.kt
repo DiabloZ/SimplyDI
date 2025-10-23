@@ -8,6 +8,7 @@ import su.vi.kdi.Named
 import su.vi.kdi.core.KDIContainer
 import su.vi.kdi.core.entry_point.addDependency
 import su.vi.kdi.core.entry_point.addDependencyAuto
+import su.vi.kdi.core.entry_point.addDependencyManually
 import su.vi.kdi.core.entry_point.getDependency
 import su.vi.kdi.core.entry_point.initialize
 import su.vi.kdi.core.entry_point.initializeContainer
@@ -54,6 +55,11 @@ public class App : Application() {
 			toTryUseKDIDSL2(this)
 		}
 
+		println("INITED FOR")
+		kotlin.repeat(10) {
+			toTryUseKDIDSL3(this)
+		}
+
 		container3 = KDIContainer.initialize(CONTAINER_NAME10) {
 			addChainScopes(listOfScopes = listOf(CONTAINER_NAME10, CONTAINER_NAME20))
 		}
@@ -73,6 +79,7 @@ private val CONTAINER_NAME20 = "testSomeContainer20"
 private val CONTAINER_NAME1 = "testSomeContainer1"
 private val CONTAINER_NAME2 = "testSomeContainer2"
 private val CONTAINER_NAME3 = "testSomeContainer3"
+private val CONTAINER_NAME4 = "testSomeContainer4"
 
 public interface SomeStorage {
 	fun getSecretString(): String
@@ -213,6 +220,39 @@ private fun toTryUseKDIDSL2(app: Application) {
 		app1.run()
 	}
 	Log.e("KDI CONTAINER DSL2", "INITED FOR - $time")
+}
+
+private fun toTryUseKDIDSL3(app: Application) {
+    val time = measureTime {
+        val kdiContainer = KDIContainer.initialize(
+            scopeName = CONTAINER_NAME4,
+            isSearchInScope = true,
+        ) {
+            addDependency { app }
+            addDependencyAuto<ConsoleLogger>()
+            addDependencyAuto<AuditService>()
+            addDependencyAuto<AuditService2>()
+            addDependency<Logger>(name = "console") { ConsoleLogger() }
+            addDependency<Logger>(name = "file") { FileLogger() }
+            addDependencyManually<Impl1>(supertypes = listOf(A::class, B::class))
+            addDependencyManually<Impl2>(supertypes = listOf(B::class, C::class))
+            addDependencyAuto<Impl3>()
+            addDependency<E>() { Impl4() }
+            addDependencyAuto<AppRunner>()
+        }
+        val audit2 = kdiContainer.getDependency<AuditService2>()
+        val audit = kdiContainer.getDependency<AuditService>()
+        audit.logger.log("Audit started.")
+        audit2.logger.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        val app1 = kdiContainer.getDependency<AppRunner>()
+        val app2 = kdiContainer.getDependency<AppRunner>()
+        val app3 = kdiContainer.getDependency<AppRunner>()
+        val app4 = kdiContainer.getDependency<AppRunner>()
+        val app5 = kdiContainer.getDependency<AppRunner>()
+		val app6 = kdiContainer.getDependency<AppRunner>()
+		app1.run()
+	}
+	Log.e("KDI CONTAINER DSL3", "INITED FOR - $time")
 }
 
 private fun toTryUseKDI(app: Application) {
