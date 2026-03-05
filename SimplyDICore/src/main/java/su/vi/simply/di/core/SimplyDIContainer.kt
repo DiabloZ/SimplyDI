@@ -182,17 +182,8 @@ public class SimplyDIContainer(
 	): SimplyDILazyWrapper<T> {
 		logger.d(TAG, "$GET_DEP_SINGLE${kClass}")
 		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
-		val dependency = scope.getNullableDependency<T>(kClass)
-			?: findInChainScopes(
-				scopeName = scopeName,
-				kClass = kClass
-			)
-			?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
-
 		return SimplyDILazyWrapper(
-			lazyValue = {
-				dependency
-			}
+			lazyValue = scope.getDependencyLambda<T>(kClass)
 		)
 	}
 

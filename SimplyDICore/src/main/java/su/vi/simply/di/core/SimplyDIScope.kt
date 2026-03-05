@@ -36,6 +36,15 @@ internal class SimplyDIScope(
 	}
 
 	/**
+	 * Use it to get dependencies through lambda with store it in list of dependencies.
+	 * @param kClass T::class of your dependency.
+	 * @return T
+	 * @throws SimplyDINotFoundException if the dependency not created you receive.
+	 **/
+	@Throws(SimplyDINotFoundException::class)
+	internal fun <T: Any> getDependencyLambda(kClass: KClass<*>): () -> T = { getDependency(kClass = kClass) }
+
+	/**
 	 * Use it to get dependencies with store it in list of dependencies.
 	 * @param kClass T::class of your dependency.
 	 * @return T
