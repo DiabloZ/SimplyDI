@@ -20,6 +20,7 @@ public object SimplyDIConstants {
 	internal const val DELETE_DEP = "Deleted dependency - "
 	internal const val DELETE_DEP_ERR = "You try to delete dependency in not created scope"
 	internal const val GET_DEP_SINGLE = "Call dependency with add to container - "
+	internal const val GET_DEP_SINGLE_LAZY = "Call dependency with add to container by lazy - "
 	internal const val GET_DEP_FACTORY = "Call dependency without add to container - "
 	internal const val GET_DEP_FACTORY_WITH_ERROR = "Call dependency without add to container with error - "
 	internal const val GET_DEP_FACTORY_NULLABLE = "Call dependency without add to container with nullable - "

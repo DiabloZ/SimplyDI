@@ -8,9 +8,9 @@ import su.vi.simply.di.core.utils.SimplyDIConstants.DEFAULT_SCOPE_NAME
 import su.vi.simply.di.core.utils.SimplyDIConstants.DELETE_DEP
 import su.vi.simply.di.core.utils.SimplyDIConstants.DELETE_DEP_ERR
 import su.vi.simply.di.core.utils.SimplyDIConstants.GET_DEP_FACTORY
-import su.vi.simply.di.core.utils.SimplyDIConstants.GET_DEP_FACTORY_NULLABLE
 import su.vi.simply.di.core.utils.SimplyDIConstants.GET_DEP_FACTORY_WITH_ERROR
 import su.vi.simply.di.core.utils.SimplyDIConstants.GET_DEP_SINGLE
+import su.vi.simply.di.core.utils.SimplyDIConstants.GET_DEP_SINGLE_LAZY
 import su.vi.simply.di.core.utils.SimplyDIConstants.LOG_DELETE_CHAIN
 import su.vi.simply.di.core.utils.SimplyDIConstants.LOG_INIT
 import su.vi.simply.di.core.utils.SimplyDIConstants.LOG_INIT_ALREADY
@@ -180,10 +180,11 @@ public class SimplyDIContainer(
 		scopeName: String = DEFAULT_SCOPE_NAME,
 		kClass: KClass<*>,
 	): SimplyDILazyWrapper<T> {
-		logger.d(TAG, "$GET_DEP_SINGLE${kClass}")
-		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
+		logger.d(TAG, "$GET_DEP_SINGLE_LAZY${kClass}")
 		return SimplyDILazyWrapper(
-			lazyValue = scope.getDependencyLambda<T>(kClass)
+			lazyValue = {
+				getDependency(kClass = kClass, scopeName = scopeName)
+			}
 		)
 	}
 
@@ -220,16 +221,6 @@ public class SimplyDIContainer(
 				kClass = kClass
 			)
 			?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
-	}
-
-	@Throws(SimplyDINotFoundException::class)
-	internal fun <T : Any> getByClass(
-		scopeName: String = DEFAULT_SCOPE_NAME,
-		kClass: KClass<*>,
-	): T? {
-		logger.d(TAG, "$GET_DEP_FACTORY_NULLABLE${kClass}")
-		val scope = mapContainers[scopeName] ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
-		return scope.getByClass(kClass)
 	}
 
 	internal fun addChainScopes(

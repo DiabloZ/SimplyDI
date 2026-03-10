@@ -36,27 +36,6 @@ internal class SimplyDIScope(
 	}
 
 	/**
-	 * Use it to get dependencies through lambda with store it in list of dependencies.
-	 * @param kClass T::class of your dependency.
-	 * @return T
-	 * @throws SimplyDINotFoundException if the dependency not created you receive.
-	 **/
-	@Throws(SimplyDINotFoundException::class)
-	internal fun <T: Any> getDependencyLambda(kClass: KClass<*>): () -> T = { getDependency(kClass = kClass) }
-
-	/**
-	 * Use it to get dependencies with store it in list of dependencies.
-	 * @param kClass T::class of your dependency.
-	 * @return T
-	 * @throws SimplyDINotFoundException if the dependency not created you receive.
-	 **/
-	@Throws(SimplyDINotFoundException::class)
-	internal fun <T : Any> getDependency(kClass: KClass<*>): T {
-		return getNullableDependency<T>(kClass = kClass)
-			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, kClass.simpleName))
-	}
-
-	/**
 	 * Use it to get dependencies without store it in list of dependencies.
 	 * @param kClass T::class of your dependency.
 	 * @return T
@@ -81,19 +60,6 @@ internal class SimplyDIScope(
 		return initializerFactory[kClass]?.invoke() as? T
 	}
 
-	/**
-	 * Use it to get dependencies without store it in list of dependencies.
-	 * @param kClass T::class of your dependency.
-	 * @return T
-	 * @throws SimplyDINotFoundException if the dependency not created you receive.
-	 **/
-	@Suppress("UNCHECKED_CAST")
-	internal fun <T> getByClassAnyway(
-		kClass: KClass<*>,
-	): T {
-		return initializerFactory[kClass]?.invoke() as? T
-			?: throw SimplyDINotFoundException(message = String.format(NOT_FOUND_ERROR, kClass.simpleName))
-	}
 
 	/**
 	 * Use it to create dependency by lazy.
