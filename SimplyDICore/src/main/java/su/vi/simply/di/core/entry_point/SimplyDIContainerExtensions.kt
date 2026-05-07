@@ -275,7 +275,7 @@ public inline fun <reified T : Any> SimplyDIContainer.getDependencyByLazy(
 	scopeName: String = this.scopeName,
 ): SimplyDILazyWrapper<T> = getDependencyByLazy(
 	scopeName = scopeName,
-	clazz = this::class
+	clazz = T::class
 )
 
 /**
@@ -433,4 +433,34 @@ public fun SimplyDIContainer.initializeContainer(
 		simplyLogLevel = simplyLogLevel,
 		isSearchInScope = isSearchInScope
 	)
+}
+
+public fun SimplyDIContainer.closeScope(scopeName: String): List<String> =
+	closeScope(scopeName)
+
+public fun SimplyDIContainer.createScope(
+	name: String,
+	isSearchInScope: Boolean = true,
+): Unit = createScope(name, isSearchInScope)
+
+public fun <T : Any> SimplyDIContainer.getOrNull(
+	scopeName: String = this.scopeName,
+	clazz: KClass<*>,
+): T? = try {
+	getDependency(scopeName = scopeName, kClass = clazz)
+} catch (_: SimplyDINotFoundException) {
+	null
+}
+
+public inline fun <reified T : Any> SimplyDIContainer.getOrNull(
+	scopeName: String = this.scopeName,
+): T? = getOrNull(scopeName, T::class)
+
+public fun <T : Any> SimplyDIContainer.override(
+	scopeName: String = this.scopeName,
+	clazz: KClass<*>,
+	factory: () -> T,
+) {
+	deleteDependency(scopeName = scopeName, kClass = clazz)
+	addDependencyNow(scopeName = scopeName, kClass = clazz, factory = factory)
 }

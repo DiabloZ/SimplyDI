@@ -1,17 +1,14 @@
 package su.vi.simply.di.core.utils
 
-import su.vi.simply.di.core.SimplyDILoggerEmpty
-import su.vi.simply.di.core.SimplyDILoggerFull
+import su.vi.simply.di.core.LogCallback
+import su.vi.simply.di.core.LogLevel
 
-/**
- * Levels of log DI [FULL] or [EMPTY]
- */
 public enum class SimplyLogLevel {
-	FULL,
-	EMPTY
+    FULL,
+    EMPTY
 }
 
-internal fun SimplyLogLevel.toSimplyDILogger() = when(this){
-	SimplyLogLevel.FULL -> SimplyDILoggerFull()
-	SimplyLogLevel.EMPTY -> SimplyDILoggerEmpty()
+internal fun SimplyLogLevel.toLogCallback(): LogCallback? = when (this) {
+    SimplyLogLevel.FULL -> { level, tag, msg -> println("[$level/$tag] $msg") }
+    SimplyLogLevel.EMPTY -> null
 }

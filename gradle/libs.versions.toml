@@ -1,6 +1,7 @@
 [versions]
 agp = "8.5.0"
 kotlin = "1.9.22"
+kotlinCoroutines = "1.7.3"
 kotlinCompilerExtensionVersion = "1.5.8"
 coreKtx = "1.10.1"
 junit = "4.13.2"
@@ -44,6 +45,8 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 androidx-lifecycle-viewmodel-compose-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose-android", version.ref = "lifecycleViewmodelComposeAndroid" }
 kdi-core = { module = "io.github.diabloz:kdi-core", version.ref = "commonKDIVersion" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinCoroutines" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinCoroutines" }
 simply-di-android = { module = "io.github.diabloz:simply-di-android", version.ref = "commonVersion" }
 simply-di-compose = { module = "io.github.diabloz:simply-di-compose", version.ref = "commonVersion" }
 simply-di-core = { module = "io.github.diabloz:simply-di-core", version.ref = "commonVersion" }
