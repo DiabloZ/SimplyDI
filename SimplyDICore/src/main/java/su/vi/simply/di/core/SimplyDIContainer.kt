@@ -34,6 +34,7 @@ public class SimplyDIContainer(
 ) {
     private var onLog: LogCallback? = null
     private val registry = ScopeRegistry()
+    private val chainScopeNames: MutableSet<String> = mutableSetOf()
 
     internal fun initialize(
         scopeName: String = DEFAULT_SCOPE_NAME,
@@ -49,6 +50,7 @@ public class SimplyDIContainer(
             registry.get(scopeName) != null && scopeName == DEFAULT_SCOPE_NAME -> return
         }
         registry.create(scopeName, isSearchInScope)
+        scopeCatalog[scopeName] = this
         onLog?.invoke(LogLevel.DEBUG, TAG, String.format(LOG_INIT, scopeName))
     }
 
@@ -119,7 +121,7 @@ public class SimplyDIContainer(
         val scope = registry.get(scopeName)
             ?: throw SimplyDINotFoundException(SCOPE_IS_NOT_INITIALIZED)
         return scope.getNullableDependency(kClass)
-            ?: registry.findInChains(scopeName, kClass)
+            ?: findInChainsCrossContainer(scopeName, kClass)
             ?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
     }
 
@@ -155,27 +157,29 @@ public class SimplyDIContainer(
         return scope.getNullableDependency(kClass)
             ?: scope.getByClass(kClass)
             ?: registry.allScopes()
-                .asSequence()
-                .filter { it.value.isSearchInScope }
-                .mapNotNull { it.value.getNullableDependency(kClass) }
-                .firstOrNull() as? T
-            ?: registry.findInChains(scopeName, kClass)
+	            .asSequence()
+	            .filter { it.value.isSearchInScope }
+                .firstNotNullOfOrNull { it.value.getNullableDependency(kClass) } as? T
+            ?: findInChainsCrossContainer(scopeName, kClass)
             ?: throw SimplyDINotFoundException(String.format(NOT_FOUND_ERROR, kClass))
     }
 
     internal fun addChainScopes(listOfScopes: List<String>): Unit = synchronized(this) {
         onLog?.invoke(LogLevel.DEBUG, TAG, String.format(LOG_INIT_CHAIN, listOfScopes.logString()))
-        registry.addChains(listOfScopes)
+        chainScopeNames.addAll(listOfScopes)
     }
 
     internal fun deleteChainedScopes(listOfScopes: List<String>): Unit = synchronized(this) {
         onLog?.invoke(LogLevel.DEBUG, TAG, String.format(LOG_DELETE_CHAIN, listOfScopes.logString()))
-        registry.removeChains(listOfScopes)
+        for (s in listOfScopes) {
+            chainScopeNames.remove(s)
+        }
     }
 
     /** Close a scope — clear all cached instances and factories. */
     internal fun closeScope(scopeName: String): List<String> = synchronized(this) {
-        val scope = registry.destroyScope(scopeName) ?: return@synchronized emptyList()
+        registry.destroyScope(scopeName) ?: return@synchronized emptyList()
+        scopeCatalog.remove(scopeName)
         onLog?.invoke(LogLevel.DEBUG, TAG, "Scope $scopeName closed")
         listOf(scopeName)
     }
@@ -187,6 +191,7 @@ public class SimplyDIContainer(
             return
         }
         registry.create(name, isSearchInScope)
+        scopeCatalog[name] = this
         onLog?.invoke(LogLevel.DEBUG, TAG, String.format(LOG_INIT, name))
     }
 
@@ -206,11 +211,10 @@ public class SimplyDIContainer(
 
                 repeat(times) {
                     seqTimer += measureTime {
-                        registry.allScopes()
-                            .asSequence()
-                            .filter { it.value.isSearchInScope }
-                            .mapNotNull { it.value.getByClass(kClass) }
-                            .firstOrNull() as? T
+	                    registry.allScopes()
+		                    .asSequence()
+		                    .filter { it.value.isSearchInScope }
+		                    .firstNotNullOfOrNull { it.value.getByClass(kClass) } as? T
                     }.inWholeMicroseconds
 
                     usuTimer += measureTime {
@@ -239,6 +243,21 @@ public class SimplyDIContainer(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
+    private fun <T : Any> findInChainsCrossContainer(scopeName: String, kClass: KClass<*>): T? {
+        for (chainName in chainScopeNames) {
+            if (chainName == scopeName) continue
+            val local = registry.get(chainName)?.getNullableDependency<T>(kClass)
+            if (local != null) return local
+            val otherContainer = scopeCatalog[chainName] ?: continue
+            if (otherContainer !== this) {
+                val remote = otherContainer.registry.get(chainName)?.getNullableDependency<T>(kClass)
+                if (remote != null) return remote
+            }
+        }
+        return null
+    }
+
     private fun isDependencyInScope(scopeName: String = DEFAULT_SCOPE_NAME, kClass: KClass<*>): Boolean =
         registry.get(scopeName)?.isDependencyInScope(kClass) == true
 
@@ -246,6 +265,7 @@ public class SimplyDIContainer(
         joinToString(prefix = "\"", separator = "\", \"", postfix = "\"")
 
     public companion object {
+        private val scopeCatalog: MutableMap<String, SimplyDIContainer> = mutableMapOf()
         private var _instance: SimplyDIContainer? = null
         public val instance: SimplyDIContainer
             get() = _instance ?: synchronized(this) {

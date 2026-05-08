@@ -159,17 +159,91 @@ class SimplyDIContainerTest {
     }
 
     @Test
-    fun `addChainScopes and find in chains`() {
-        container.addDependencyNow("test", Int::class) { 99 }
+    fun `addChainScopes finds dependency in local chain scope`() {
+        container.createScope("other")
+        container.addDependencyNow(scopeName = "other", kClass = Int::class, factory = { 99 })
         container.addChainScopes(listOf("test", "other"))
-        val result: Int = container.getByClassAnyway(scopeName = "test", kClass = Int::class)
+        val result: Int = container.getDependency(kClass = Int::class, scopeName = "test")
         assertEquals(99, result)
     }
 
     @Test
-    fun `deleteChainedScopes removes chains`() {
+    fun `deleteChainedScopes removes chain lookup`() {
+        container.createScope("other")
+        container.addDependencyNow(scopeName = "other", kClass = Int::class, factory = { 99 })
         container.addChainScopes(listOf("test", "other"))
         container.deleteChainedScopes(listOf("test", "other"))
+        try {
+            val _result: Int = container.getDependency(kClass = Int::class, scopeName = "test")
+            fail("Expected SimplyDINotFoundException")
+        } catch (e: Exception) {
+            assertTrue(e is su.vi.simply.di.core.error.SimplyDINotFoundException)
+        }
+    }
+
+    @Test
+    fun `cross-container chain lookup works`() {
+        val containerA = SimplyDIContainer(scopeName = "moduleA", isSearchInScope = true)
+        containerA.initialize("moduleA")
+        containerA.addDependencyNow(scopeName = "moduleA", kClass = String::class, factory = { "from A" })
+
+        val containerB = SimplyDIContainer(scopeName = "moduleB", isSearchInScope = true)
+        containerB.initialize("moduleB")
+        containerB.addDependencyNow(scopeName = "moduleB", kClass = Int::class, factory = { 42 })
+
+        containerA.addChainScopes(listOf("moduleA", "moduleB"))
+        containerB.addChainScopes(listOf("moduleA", "moduleB"))
+
+        val result: Int = containerA.getDependency(kClass = Int::class, scopeName = "moduleA")
+        assertEquals(42, result)
+
+        val result2: String = containerB.getDependency(kClass = String::class, scopeName = "moduleB")
+        assertEquals("from A", result2)
+    }
+
+    @Test
+    fun `unlinked third container cannot access chain dependencies`() {
+        val containerA = SimplyDIContainer(scopeName = "moduleA", isSearchInScope = true)
+        containerA.initialize("moduleA")
+        containerA.addDependencyNow(scopeName = "moduleA", kClass = String::class, factory = { "from A" })
+
+        val containerB = SimplyDIContainer(scopeName = "moduleB", isSearchInScope = true)
+        containerB.initialize("moduleB")
+        containerB.addDependencyNow(scopeName = "moduleB", kClass = Int::class, factory = { 42 })
+
+        containerA.addChainScopes(listOf("moduleA", "moduleB"))
+        containerB.addChainScopes(listOf("moduleA", "moduleB"))
+
+        val containerC = SimplyDIContainer(scopeName = "moduleC", isSearchInScope = true)
+        containerC.initialize("moduleC")
+
+        try {
+            val _r1: String = containerC.getDependency(kClass = String::class, scopeName = "moduleC")
+            fail("Expected SimplyDINotFoundException")
+        } catch (e: Exception) {
+            assertTrue(e is su.vi.simply.di.core.error.SimplyDINotFoundException)
+        }
+
+        try {
+            val _r2: Int = containerC.getDependency(kClass = Int::class, scopeName = "moduleC")
+            fail("Expected SimplyDINotFoundException")
+        } catch (e: Exception) {
+            assertTrue(e is su.vi.simply.di.core.error.SimplyDINotFoundException)
+        }
+
+        try {
+            val _r3: String = containerC.getByClassAnyway(scopeName = "moduleC", kClass = String::class)
+            fail("Expected SimplyDINotFoundException")
+        } catch (e: Exception) {
+            assertTrue(e is su.vi.simply.di.core.error.SimplyDINotFoundException)
+        }
+
+        try {
+            val _r4: Int = containerC.getByClassAnyway(scopeName = "moduleC", kClass = Int::class)
+            fail("Expected SimplyDINotFoundException")
+        } catch (e: Exception) {
+            assertTrue(e is su.vi.simply.di.core.error.SimplyDINotFoundException)
+        }
     }
 
     @Test

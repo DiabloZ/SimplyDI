@@ -55,45 +55,6 @@ class ScopeRegistryTest {
     }
 
     @Test
-    fun `addChains and findInChains`() {
-        registry.create("s1", true)
-        registry.create("s2", true)
-        registry.get("s2")!!.createDependencyNow(String::class) { "from s2" }
-        registry.addChains(listOf("s1", "s2"))
-        val result = registry.findInChains<String>("s1", String::class)
-        assertEquals("from s2", result)
-    }
-
-    @Test
-    fun `findInChains returns null when not found`() {
-        registry.create("s1", true)
-        registry.create("s2", true)
-        registry.addChains(listOf("s1", "s2"))
-        val result = registry.findInChains<String>("s1", String::class)
-        assertNull(result)
-    }
-
-    @Test
-    fun `findInChains skips same scope`() {
-        registry.create("s1", true)
-        registry.get("s1")!!.createDependencyNow(String::class) { "same" }
-        registry.addChains(listOf("s1"))
-        val result = registry.findInChains<String>("s1", String::class)
-        assertNull(result)
-    }
-
-    @Test
-    fun `removeChains removes chain`() {
-        registry.create("s1", true)
-        registry.create("s2", true)
-        registry.get("s2")!!.createDependencyNow(String::class) { "chained" }
-        registry.addChains(listOf("s1", "s2"))
-        registry.removeChains(listOf("s1", "s2"))
-        val result = registry.findInChains<String>("s1", String::class)
-        assertNull(result)
-    }
-
-    @Test
     fun `destroyScope removes scope and clears it`() {
         registry.create("s1", true)
         registry.get("s1")!!.createDependencyNow(String::class) { "data" }
