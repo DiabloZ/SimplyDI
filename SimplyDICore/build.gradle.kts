@@ -1,71 +1,88 @@
 import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
-    `java-library`
-    alias(libs.plugins.jetbrains.kotlin.jvm)
-    alias(libs.plugins.vanniktechMavenPublish)
+	alias(libs.plugins.android.library)
+	alias(libs.plugins.jetbrains.kotlin.android)
+	alias(libs.plugins.vanniktechMavenPublish)
 }
 
-kotlin {
-    explicitApi()
-}
+android {
+	namespace = libs.versions.nameSpaceSDK.get()
+	compileSdk = libs.versions.compileSDK.get().toInt()
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
+	defaultConfig {
+		minSdk = libs.versions.minSDKVersionSDK.get().toInt()
 
-tasks.test {
-    useJUnit()
-    testLogging {
-        events("passed", "skipped", "failed")
-    }
+		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+		consumerProguardFiles("consumer-rules.pro")
+	}
+
+	buildTypes {
+		release {
+			isMinifyEnabled = false
+			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+		}
+	}
+	compileOptions {
+		sourceCompatibility = JavaVersion.VERSION_1_8
+		targetCompatibility = JavaVersion.VERSION_1_8
+	}
+
+	kotlinOptions {
+		jvmTarget = JavaVersion.VERSION_1_8.toString()
+		freeCompilerArgs += "-Xexplicit-api=strict"
+	}
+
 }
 
 dependencies {
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlin.reflect)
-    testImplementation(libs.kotlinx.coroutines.core)
-    testImplementation(libs.kotlinx.coroutines.test)
+	testImplementation(libs.junit)
+	androidTestImplementation(libs.androidx.junit)
+	androidTestImplementation(libs.androidx.espresso.core)
 }
-
 
 mavenPublishing {
-    coordinates(
-        groupId = "io.github.diabloz",
-        artifactId = "simply-di-core",
-        version = libs.versions.coreSimplyVersion.get()
-    )
-    pom {
-        name = "SimplyDICore"
-        description = "The simplest and lightest library for DI"
-        url = "https://github.com/DiabloZ/SimplyDI"
-        inceptionYear = "2024"
+	coordinates(
+		groupId = "io.github.diabloz",
+		artifactId = "simply-di-core", //
+		version = libs.versions.coreSimplyVersion.get()
+	)
+	pom {
+		name = "SimplyDICore" //
+		description = "The simplest and lightest library for DI" //
+		url = "https://github.com/DiabloZ/SimplyDI"
+		inceptionYear = "2024"
 
-        licenses {
-            license {
-                name = "The Apache License, Version 2.0"
-                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-            }
-        }
+		licenses {
+			license {
+				name = "The Apache License, Version 2.0"
+				url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+			}
+		}
 
-        developers {
-            developer {
-                id = "DiabloZ"
-                name = "Vitaly Suhov"
-                email = "DiabloZ@me.com"
-            }
-        }
+		developers {
+			developer {
+				id = "DiabloZ"
+				name = "Vitaly Suhov"
+				email = "DiabloZ@me.com"
+			}
+		}
 
-        scm {
-            connection = "scm:git:git://github.com/DiabloZ/SimplyDI.git"
-            developerConnection = "scm:git:ssh://github.com:DiabloZ/SimplyDI.git"
-            url = "https://github.com/DiabloZ/SimplyDI"
-        }
+		scm {
+			connection = "scm:git:git://github.com/DiabloZ/SimplyDI.git"
+			developerConnection = "scm:git:ssh://github.com:DiabloZ/SimplyDI.git"
+			url = "https://github.com/DiabloZ/SimplyDI"
+		}
 
-        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+		publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-        signAllPublications()
-    }
+		signAllPublications()
+	}
 }
+
+/*configurePublishing(
+	artifactId = "simply-di-core",
+	projectName = "SimplyDICore",
+	projectDescription = "The simplest and lightest library for DI",
+	projectVersion = "1.0.1"
+)*/
